@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Giải Pháp Nâng Cao Hiệu Quả PNT — ManLab</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --navy:   #1A3260;
+    --blue:   #2563EB;
+    --amber:  #D97706;
+    --red:    #B91C1C;
+    --teal:   #0F766E;
+    --green:  #16A34A;
+    --bg:     #F1F5FB;
+    --surf:   #FFFFFF;
+    --border: #D1DAE8;
+    --text:   #111827;
+    --muted:  #4B5563;
+    --light:  #9CA3AF;
+  }
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.6; }
+
+  /* Header */
+  header {
+    background: var(--navy); border-bottom: 3px solid var(--amber);
+    padding: 0 36px; height: 58px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .h-brand { display: flex; align-items: center; gap: 14px; }
+  .h-logo { width: 34px; height: 34px; background: var(--amber); border-radius: 5px; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:13px; color:var(--navy); }
+  .h-title { font-size: 13px; font-weight: 700; color: #E2E8F0; letter-spacing:.04em; text-transform:uppercase; }
+  .h-sub   { font-size: 11px; color: #718096; margin-top: 1px; }
+  .h-back  { font-size: 12px; color: #718096; text-decoration: none; padding: 6px 14px; border: 1px solid #2D4A7A; border-radius: 4px; }
+  .h-back:hover { color: #E2E8F0; }
+
+  /* Layout */
+  main { max-width: 960px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  .eyebrow {
+    font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--light); margin-bottom: 14px; margin-top: 48px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .eyebrow::after { content:''; flex:1; height:1px; background:var(--border); }
+  .eyebrow:first-child { margin-top: 0; }
+
+  /* Hero insight */
+  .hero {
+    background: var(--navy);
+    border-radius: 10px; padding: 36px 40px; margin-bottom: 8px;
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; top: -40px; right: -40px;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(217,119,6,.15) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .hero-tag { font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--amber); margin-bottom: 14px; }
+  .hero-title { font-size: 26px; font-weight: 800; color: #fff; line-height: 1.25; margin-bottom: 14px; text-wrap: balance; }
+  .hero-title span { color: var(--amber); }
+  .hero-body { font-size: 13px; color: #94A3B8; line-height: 1.75; max-width: 620px; }
+  .hero-stats { display: flex; gap: 32px; margin-top: 24px; flex-wrap: wrap; }
+  .hs { }
+  .hs-val { font-size: 28px; font-weight: 800; color: #fff; font-variant-numeric: tabular-nums; line-height: 1; }
+  .hs-val.good { color: #34D399; }
+  .hs-val.bad  { color: #FCA5A5; }
+  .hs-lbl { font-size: 11px; color: #64748B; margin-top: 4px; }
+
+  /* Insight box */
+  .insight {
+    border-radius: 7px; padding: 18px 22px; margin-bottom: 12px;
+    display: flex; gap: 16px; align-items: flex-start;
+  }
+  .insight.i-amber { background: #FFFBEB; border: 1px solid #FDE68A; }
+  .insight.i-red   { background: #FEF2F2; border: 1px solid #FECACA; }
+  .insight.i-green { background: #F0FDF4; border: 1px solid #BBF7D0; }
+  .insight-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .insight-title { font-size: 13px; font-weight: 700; margin-bottom: 3px; }
+  .insight-body  { font-size: 12px; color: var(--muted); line-height: 1.7; }
+
+  /* 3 pillars */
+  .pillars { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+  .pillar {
+    background: var(--surf); border: 1px solid var(--border);
+    border-radius: 8px; overflow: hidden;
+  }
+  .pillar-top { padding: 20px 20px 16px; border-bottom: 1px solid var(--border); }
+  .pillar-num { font-size: 11px; font-weight: 800; letter-spacing: .1em; color: var(--light); margin-bottom: 8px; }
+  .pillar-icon {
+    width: 40px; height: 40px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; margin-bottom: 12px;
+  }
+  .p1 .pillar-icon { background: #DBEAFE; }
+  .p2 .pillar-icon { background: #FEF3C7; }
+  .p3 .pillar-icon { background: #D1FAE5; }
+  .pillar-title { font-size: 15px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+  .pillar-sub   { font-size: 11px; color: var(--muted); }
+  .pillar-body  { padding: 16px 20px; }
+  .pillar-kv { margin-bottom: 10px; }
+  .kv-label { font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--light); margin-bottom: 3px; }
+  .kv-val   { font-size: 13px; font-weight: 600; color: var(--text); }
+  .pillar-rule {
+    background: var(--bg); border-radius: 5px; padding: 10px 12px;
+    font-size: 12px; color: var(--muted); line-height: 1.6; margin-top: 10px;
+  }
+  .pillar-rule strong { color: var(--text); }
+
+  /* Steps */
+  .steps { display: flex; flex-direction: column; gap: 0; }
+  .step-row {
+    display: grid; grid-template-columns: 48px 1fr;
+    gap: 0; position: relative;
+  }
+  .step-left { display: flex; flex-direction: column; align-items: center; }
+  .step-dot {
+    width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 800; flex-shrink: 0; z-index: 1;
+  }
+  .step-line { flex: 1; width: 2px; background: var(--border); margin: 4px 0; }
+  .step-row:last-child .step-line { display: none; }
+  .sd1 { background: #FEE2E2; color: #991B1B; }
+  .sd2 { background: #FEF3C7; color: #92400E; }
+  .sd3 { background: #DBEAFE; color: #1E40AF; }
+  .sd4 { background: #D1FAE5; color: #065F46; }
+  .sd5 { background: #EDE9FE; color: #5B21B6; }
+  .step-content { padding: 0 0 28px 16px; }
+  .step-timing { font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--light); margin-bottom: 5px; }
+  .step-title { font-size: 15px; font-weight: 800; color: var(--text); margin-bottom: 8px; }
+  .step-body { font-size: 13px; color: var(--muted); line-height: 1.75; }
+  .step-body strong { color: var(--text); }
+  .step-actions { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
+  .action-item { display: flex; gap: 10px; align-items: flex-start; font-size: 12px; color: var(--muted); }
+  .action-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); flex-shrink: 0; margin-top: 6px; }
+  .action-item.highlight .action-dot { background: var(--amber); }
+  .action-item.highlight { color: var(--text); font-weight: 600; }
+
+  /* KPI table */
+  .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .kpi-card {
+    background: var(--surf); border: 1px solid var(--border);
+    border-radius: 7px; padding: 16px 18px;
+    border-top: 3px solid transparent;
+  }
+  .kpi-card.kt { border-top-color: var(--red); }
+  .kpi-card.k1 { border-top-color: var(--amber); }
+  .kpi-card.k2 { border-top-color: var(--blue); }
+  .kpi-card.k3 { border-top-color: var(--teal); }
+  .kpi-card.k4 { border-top-color: var(--green); }
+  .kpi-card.k5 { border-top-color: var(--navy); }
+  .kpi-label  { font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--light); margin-bottom: 8px; }
+  .kpi-current { font-size: 24px; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--red); line-height: 1; }
+  .kpi-target  { font-size: 14px; font-weight: 700; color: var(--green); margin-top: 4px; font-variant-numeric: tabular-nums; }
+  .kpi-arrow   { color: var(--light); font-size: 11px; margin: 0 4px; }
+  .kpi-desc    { font-size: 11px; color: var(--muted); margin-top: 6px; line-height: 1.5; }
+
+  /* SOP table */
+  .sop-table { width: 100%; border-collapse: collapse; }
+  .sop-table th { font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--light); padding: 0 14px 12px; text-align: left; border-bottom: 2px solid var(--border); }
+  .sop-table td { padding: 11px 14px; border-bottom: 1px solid #F3F4F6; font-size: 12px; vertical-align: top; }
+  .sop-table tr:last-child td { border: none; }
+  .sop-table tr:hover td { background: #FAFBFD; }
+  .pill { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: .04em; padding: 3px 9px; border-radius: 3px; }
+  .p-ptn  { background: #DBEAFE; color: #1E40AF; }
+  .p-ht   { background: #FEF3C7; color: #92400E; }
+  .p-ntp  { background: #EDE9FE; color: #5B21B6; }
+  .p-co   { background: #D1FAE5; color: #065F46; }
+
+  /* Comparison */
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .compare-col { background: var(--surf); border: 1px solid var(--border); border-radius: 7px; overflow: hidden; }
+  .compare-head { padding: 14px 18px; font-size: 13px; font-weight: 700; }
+  .compare-col.old .compare-head { background: #FEF2F2; color: var(--red); border-bottom: 1px solid #FECACA; }
+  .compare-col.new .compare-head { background: #F0FDF4; color: var(--green); border-bottom: 1px solid #BBF7D0; }
+  .compare-list { padding: 14px 18px; display: flex; flex-direction: column; gap: 10px; }
+  .ci { display: flex; gap: 10px; align-items: flex-start; font-size: 12px; color: var(--muted); }
+  .ci-dot { width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; flex-shrink: 0; font-weight: 700; margin-top: 1px; }
+  .old .ci-dot { background: #FEE2E2; color: #991B1B; }
+  .new .ci-dot { background: #D1FAE5; color: #065F46; }
+  .ci-text strong { color: var(--text); }
+
+  /* Alert system visual */
+  .alert-flow { display: flex; flex-direction: column; gap: 8px; }
+  .af-row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 6px; border: 1px solid var(--border); background: var(--surf); }
+  .af-badge { font-size: 10px; font-weight: 700; letter-spacing: .06em; padding: 4px 10px; border-radius: 3px; flex-shrink: 0; width: 90px; text-align: center; }
+  .af-time  { font-size: 13px; font-weight: 700; color: var(--text); width: 120px; flex-shrink: 0; font-variant-numeric: tabular-nums; }
+  .af-desc  { font-size: 12px; color: var(--muted); flex: 1; }
+  .af-who   { font-size: 11px; font-weight: 600; color: var(--light); flex-shrink: 0; }
+  .ab-1 { background: #FEF3C7; color: #92400E; }
+  .ab-2 { background: #FED7AA; color: #9A3412; }
+  .ab-3 { background: #FEE2E2; color: #991B1B; }
+  .ab-4 { background: #7F1D1D; color: #fff; }
+
+  /* Card */
+  .card { background: var(--surf); border: 1px solid var(--border); border-radius: 7px; margin-bottom: 16px; overflow: hidden; }
+  .card-h { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .card-h h3 { font-size: 13px; font-weight: 700; }
+  .card-b { padding: 18px 20px; }
+
+  /* Footer */
+  footer { background: var(--navy); color: #64748B; font-size: 12px; text-align: center; padding: 24px; margin-top: 48px; }
+  footer a { color: #94A3B8; text-decoration: none; margin: 0 8px; }
+
+  @media(max-width: 720px) {
+    .pillars { grid-template-columns: 1fr; }
+    .kpi-grid { grid-template-columns: 1fr 1fr; }
+    .compare  { grid-template-columns: 1fr; }
+    .hero { padding: 24px 20px; }
+    .hero-title { font-size: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="h-brand">
+    <div class="h-logo">PTĐ</div>
+    <div>
+      <div class="h-title">Giải Pháp Nâng Cao Hiệu Quả PNT</div>
+      <div class="h-sub">Từ dữ liệu thực tế → Hành động cụ thể</div>
+    </div>
+  </div>
+  <a href="index.html" class="h-back">← Trang chủ</a>
+</header>
+
+<main>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-tag">Phân tích từ 10.756 phiếu Q1–Q2/2026</div>
+    <div class="hero-title">Vấn đề không phải năng lực —<br>mà là <span>thiếu sở hữu, thiếu deadline, thiếu tầm nhìn</span></div>
+    <div class="hero-body">
+      Dữ liệu cho thấy <strong style="color:#E2E8F0">81,8% phiếu có thể xử lý trong 1 ngày</strong>. Năng lực của đội ngũ hoàn toàn đủ. Nhưng tỉ lệ BGSP chỉ đạt 42% — và đang giảm từ 58,8% (Q1) xuống 26,5% (Q2). Nguyên nhân không phải thiếu người hay thiếu thời gian; mà là không ai biết mình phải làm gì tiếp theo, và không ai thấy phiếu của mình đang ở đâu.
+    </div>
+    <div class="hero-stats">
+      <div class="hs"><div class="hs-val good">81,8%</div><div class="hs-lbl">Phiếu xử lý được trong 1 ngày</div></div>
+      <div class="hs"><div class="hs-val bad">26,5%</div><div class="hs-lbl">Tỉ lệ BGSP Q2 (đang giảm)</div></div>
+      <div class="hs"><div class="hs-val bad">1.368</div><div class="hs-lbl">Phiếu không có người chịu trách nhiệm</div></div>
+      <div class="hs"><div class="hs-val good">3.235</div><div class="hs-lbl">GCN đã có, chỉ cần bàn giao</div></div>
+    </div>
+  </div>
+
+  <!-- Key insights -->
+  <div class="eyebrow">Chẩn đoán cốt lõi</div>
+  <div class="insight i-red">
+    <div class="insight-icon">📉</div>
+    <div>
+      <div class="insight-title">Q2 đang tệ hơn Q1 — xu hướng cần đảo ngược ngay</div>
+      <div class="insight-body">BGSP Q1 = 58,8% → Q2 = <strong>26,5%</strong>. Trả PTĐ Q1 = 92,2% → Q2 = <strong>74%</strong>. Không phải vì Q2 có nhiều phiếu hơn — mà vì quy trình đang không theo kịp tốc độ phát sinh. Nếu không can thiệp, Q3 sẽ còn tệ hơn.</div>
+    </div>
+  </div>
+  <div class="insight i-amber">
+    <div class="insight-icon">🔑</div>
+    <div>
+      <div class="insight-title">Bước BGSP là bước duy nhất không có người được giao rõ ràng</div>
+      <div class="insight-body">Nhận PTĐ → ai quét nấy chịu. Trả PTĐ → ai quét nấy chịu. Nhưng BGSP — <strong>không ai được giao</strong>. Cột "Người giao BGSP" gần như trống toàn bộ trong 6.266 phiếu chưa hoàn thành. Đây là điểm chết trong quy trình.</div>
+    </div>
+  </div>
+  <div class="insight i-green">
+    <div class="insight-icon">💡</div>
+    <div>
+      <div class="insight-title">3.235 GCN đã sẵn sàng — không cần làm thêm gì, chỉ cần bàn giao</div>
+      <div class="insight-body">Đây là cơ hội xử lý ngay: <strong>3.235 phiếu</strong> đã có số GCN, PTĐ đã trả, BBĐL đã trả. Chỉ cần ai đó nhận task bàn giao vật lý và cập nhật hệ thống. Nếu làm tốt, tỉ lệ BGSP có thể nhảy từ 42% lên gần 72% chỉ trong vài tuần.</div>
+    </div>
+  </div>
+
+  <!-- 3 pillars -->
+  <div class="eyebrow">3 Trụ cột giải pháp</div>
+  <div class="pillars">
+    <div class="pillar p1">
+      <div class="pillar-top">
+        <div class="pillar-num">TRỤ CỘT 01</div>
+        <div class="pillar-icon">👤</div>
+        <div class="pillar-title">OWNERSHIP</div>
+        <div class="pillar-sub">Mỗi phiếu — 1 người chủ — từ đầu đến cuối</div>
+      </div>
+      <div class="pillar-body">
+        <div class="pillar-kv">
+          <div class="kv-label">Vấn đề hiện tại</div>
+          <div class="kv-val">1.368 phiếu không có người TH</div>
+        </div>
+        <div class="pillar-kv">
+          <div class="kv-label">Nguyên tắc mới</div>
+          <div class="kv-val">Người khởi tạo PNT = chủ sở hữu mặc định</div>
+        </div>
+        <div class="pillar-rule">
+          <strong>Quy tắc:</strong> Khi tạo phiếu, bắt buộc chọn "Người chịu trách nhiệm BGSP". Không thể lưu phiếu nếu bỏ trống. Ownership này tồn tại đến khi BGSP được đóng.
+        </div>
+      </div>
+    </div>
+    <div class="pillar p2">
+      <div class="pillar-top">
+        <div class="pillar-num">TRỤ CỘT 02</div>
+        <div class="pillar-icon">⏱️</div>
+        <div class="pillar-title">DEADLINE</div>
+        <div class="pillar-sub">Mỗi bước có hạn chót — không phải "làm khi rảnh"</div>
+      </div>
+      <div class="pillar-body">
+        <div class="pillar-kv">
+          <div class="kv-label">Vấn đề hiện tại</div>
+          <div class="kv-val">Phiếu tồn max 137 ngày, không ai hay</div>
+        </div>
+        <div class="pillar-kv">
+          <div class="kv-label">SLA theo địa điểm</div>
+          <div class="kv-val">PTN: 3 ngày · Hiện trường: 7 ngày · NTP: 14 ngày</div>
+        </div>
+        <div class="pillar-rule">
+          <strong>Quy tắc:</strong> Sau khi ra GCN, đồng hồ bắt đầu chạy. Vượt SLA → hệ thống tự cảnh báo và escalate lên cấp trên. Không có ngoại lệ trừ khi có phê duyệt bằng văn bản.
+        </div>
+      </div>
+    </div>
+    <div class="pillar p3">
+      <div class="pillar-top">
+        <div class="pillar-num">TRỤ CỘT 03</div>
+        <div class="pillar-icon">👁️</div>
+        <div class="pillar-title">VISIBILITY</div>
+        <div class="pillar-sub">Mọi người thấy việc của mình — không ai ẩn náu</div>
+      </div>
+      <div class="pillar-body">
+        <div class="pillar-kv">
+          <div class="kv-label">Vấn đề hiện tại</div>
+          <div class="kv-val">Không có view cá nhân, chỉ thấy khi báo cáo tổng</div>
+        </div>
+        <div class="pillar-kv">
+          <div class="kv-label">Giải pháp</div>
+          <div class="kv-val">Mỗi cán bộ có "hộp thư" phiếu của mình mỗi sáng</div>
+        </div>
+        <div class="pillar-rule">
+          <strong>Quy tắc:</strong> 7h sáng mỗi ngày: mỗi người nhận danh sách phiếu của mình (Zalo/email). Màu xanh = đúng hạn, vàng = sắp hạn, đỏ = quá hạn. Lãnh đạo thấy toàn bộ đội.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SOP by type -->
+  <div class="eyebrow">SOP theo loại yêu cầu — Quy trình chuẩn hóa từng nhóm</div>
+  <div class="card">
+    <div class="card-b" style="padding: 0; overflow-x: auto;">
+      <table class="sop-table">
+        <thead>
+          <tr>
+            <th>Loại yêu cầu</th>
+            <th>Địa điểm</th>
+            <th>SLA trả PTĐ</th>
+            <th>SLA BGSP sau GCN</th>
+            <th>Cách bàn giao GCN</th>
+            <th>Người chịu trách nhiệm BGSP</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>HC – Hiệu chuẩn</strong><br><small style="color:var(--light)">5.168 phiếu</small></td>
+            <td><span class="pill p-ptn">PTN ETV</span></td>
+            <td>Cùng ngày</td>
+            <td><strong>3 ngày làm việc</strong></td>
+            <td>Khách đến lấy trực tiếp hoặc chuyển phát nội bộ</td>
+            <td>Người khởi tạo PNT</td>
+          </tr>
+          <tr>
+            <td><strong>KĐ – Kiểm định</strong><br><small style="color:var(--light)">2.166 phiếu</small></td>
+            <td><span class="pill p-ptn">PTN ETV</span> <span class="pill p-ht">Hiện trường</span></td>
+            <td>Cùng ngày – 1 ngày</td>
+            <td><strong>3–7 ngày</strong></td>
+            <td>PTN: khách lấy trực tiếp. Hiện trường: bưu điện hoặc chuyến hiện trường kế tiếp</td>
+            <td>Người thực hiện PTĐ</td>
+          </tr>
+          <tr>
+            <td><strong>KĐTN</strong><br><small style="color:var(--light)">685 phiếu · 99% sẵn sàng</small></td>
+            <td><span class="pill p-co">Cơ sở KH</span></td>
+            <td>Tại chỗ</td>
+            <td><strong>7 ngày</strong> (gộp chuyến)</td>
+            <td>Giao tại cơ sở trong lần kiểm định tiếp theo hoặc chuyển phát</td>
+            <td>Người thực hiện PTĐ</td>
+          </tr>
+          <tr>
+            <td><strong>NTP (RA)</strong><br><small style="color:var(--light)">1.533 phiếu · chỉ 13% sẵn sàng</small></td>
+            <td><span class="pill p-ntp">Đơn vị NTP</span></td>
+            <td>Theo hợp đồng NTP ≤ 30 ngày</td>
+            <td><strong>14 ngày</strong> sau khi nhận BBĐL</td>
+            <td>NTP giao kèm hoặc phòng lấy về từ NTP</td>
+            <td>Người khởi tạo PNT + đốc thúc NTP</td>
+          </tr>
+          <tr>
+            <td><strong>ĐGHT – Đánh giá hiện trường</strong><br><small style="color:var(--light)">273 phiếu</small></td>
+            <td><span class="pill p-ht">Hiện trường</span></td>
+            <td>Không thu PTĐ</td>
+            <td><strong>14 ngày</strong></td>
+            <td>Chuyển phát hoặc chuyến hiện trường kế tiếp</td>
+            <td>Người thực hiện PTĐ</td>
+          </tr>
+          <tr>
+            <td><strong>Không thực hiện</strong><br><small style="color:var(--light)">1.339 phiếu · 585 chưa đóng</small></td>
+            <td>—</td>
+            <td>Trả ngay</td>
+            <td><strong>Đóng phiếu ngoại lệ</strong></td>
+            <td>Không bàn giao — đóng phiếu kèm lý do</td>
+            <td>Người khởi tạo PNT xin duyệt đóng</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Alert system -->
+  <div class="eyebrow">Hệ thống cảnh báo leo thang — 4 cấp độ</div>
+  <div class="card">
+    <div class="card-b">
+      <div class="alert-flow">
+        <div class="af-row">
+          <span class="af-badge ab-1">CẤP 1</span>
+          <div class="af-time">Ngày 1–3 quá hạn</div>
+          <div class="af-desc">Nhắc nhở tự động qua <strong>Zalo / email</strong> gửi đến cán bộ chịu trách nhiệm: "Phiếu [Số PNT] đang đến hạn BGSP"</div>
+          <div class="af-who">→ Cán bộ TH</div>
+        </div>
+        <div class="af-row">
+          <span class="af-badge ab-2">CẤP 2</span>
+          <div class="af-time">Ngày 4–7 quá hạn</div>
+          <div class="af-desc">Cảnh báo <strong>Zalo nhóm</strong> phòng: "[Tên cán bộ] có X phiếu quá hạn BGSP cần xử lý trong hôm nay"</div>
+          <div class="af-who">→ Nhóm phòng</div>
+        </div>
+        <div class="af-row">
+          <span class="af-badge ab-3">CẤP 3</span>
+          <div class="af-time">Ngày 8–14 quá hạn</div>
+          <div class="af-desc">Báo cáo trực tiếp lên <strong>Trưởng phòng</strong>: danh sách phiếu quá hạn kèm tên người phụ trách và số ngày tồn đọng</div>
+          <div class="af-who">→ Trưởng phòng</div>
+        </div>
+        <div class="af-row">
+          <span class="af-badge ab-4">CẤP 4</span>
+          <div class="af-time">Trên 14 ngày</div>
+          <div class="af-desc">Báo cáo <strong>Lãnh đạo đơn vị</strong>. Phiếu được đánh dấu "Tắc nghẽn nghiêm trọng". Yêu cầu giải trình bằng văn bản.</div>
+          <div class="af-who">→ Lãnh đạo</div>
+        </div>
+      </div>
+      <p style="font-size:11px;color:var(--muted);margin-top:14px;line-height:1.6;">
+        Công cụ khả thi hiện tại: <strong>Google Sheets + Apps Script</strong> (miễn phí, cài trong 1 ngày), hoặc tích hợp vào hệ thống hiện có của đơn vị. Zalo OA gửi tin nhắn tự động theo lịch cron.
+      </p>
+    </div>
+  </div>
+
+  <!-- Lộ trình 30-60-90 ngày -->
+  <div class="eyebrow">Lộ trình thực hiện — 30 / 60 / 90 ngày</div>
+  <div class="steps">
+    <div class="step-row">
+      <div class="step-left">
+        <div class="step-dot sd1">1</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-content">
+        <div class="step-timing">NGAY HÔM NAY → TUẦN 1</div>
+        <div class="step-title">Dọn tồn đọng khẩn cấp</div>
+        <div class="step-body">Không chờ hệ thống hoàn chỉnh. Làm thủ công ngay với dữ liệu có sẵn.</div>
+        <div class="step-actions">
+          <div class="action-item highlight"><div class="action-dot"></div><div>Phân công người TH cho 1.368 phiếu trống — giao trong ngày hôm nay</div></div>
+          <div class="action-item highlight"><div class="action-dot"></div><div>Chiến dịch thu hồi 392 PTĐ chưa trả — deadline 5 ngày, báo cáo sáng chiều</div></div>
+          <div class="action-item highlight"><div class="action-dot"></div><div>Gửi công văn đến NTP đòi 418 thiết bị + 874 BBĐL tồn đọng</div></div>
+          <div class="action-item"><div class="action-dot"></div><div>Lập danh sách 3.235 GCN sẵn sàng bàn giao, phân công theo đơn vị</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-row">
+      <div class="step-left">
+        <div class="step-dot sd2">2</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-content">
+        <div class="step-timing">TUẦN 2–4 (30 NGÀY)</div>
+        <div class="step-title">Thiết lập quy trình chuẩn + SLA</div>
+        <div class="step-body">Chuẩn hóa cách làm để ai cũng biết mình phải làm gì và đến khi nào.</div>
+        <div class="step-actions">
+          <div class="action-item highlight"><div class="action-dot"></div><div>Ban hành <strong>SOP Phiếu Nhận Trả</strong>: 1 trang A4 mỗi loại yêu cầu (HC, KĐ, NTP, KĐTN, ĐGHT)</div></div>
+          <div class="action-item highlight"><div class="action-dot"></div><div>Chiến dịch BGSP batch: mỗi tuần đóng 500 phiếu từ nhóm 3.235 sẵn sàng</div></div>
+          <div class="action-item"><div class="action-dot"></div><div>Xây bảng theo dõi tuần (Google Sheets): 5 số liệu cốt lõi, update hàng ngày</div></div>
+          <div class="action-item"><div class="action-dot"></div><div>Lãnh đạo xem báo cáo 5 phút mỗi sáng — không cần họp</div></div>
+          <div class="action-item"><div class="action-dot"></div><div>Duyệt đóng 585 phiếu "Không thực hiện" theo luồng ngoại lệ</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-row">
+      <div class="step-left">
+        <div class="step-dot sd3">3</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-content">
+        <div class="step-timing">THÁNG 2 (60 NGÀY)</div>
+        <div class="step-title">Cài đặt hệ thống cảnh báo tự động</div>
+        <div class="step-body">Chuyển từ theo dõi thủ công sang tự động — để lãnh đạo không cần nhắc nhở mãi.</div>
+        <div class="step-actions">
+          <div class="action-item highlight"><div class="action-dot"></div><div>Thiết lập cảnh báo Zalo OA 4 cấp theo SLA (như sơ đồ trên)</div></div>
+          <div class="action-item highlight"><div class="action-dot"></div><div>Yêu cầu IT bổ sung <strong>validation bắt buộc</strong>: không tạo được phiếu nếu không chọn người TH</div></div>
+          <div class="action-item"><div class="action-dot"></div><div>Dashboard cá nhân: mỗi cán bộ thấy phiếu của mình theo màu RAG (đỏ/vàng/xanh)</div></div>
+          <div class="action-item"><div class="action-dot"></div><div>Bổ sung điều khoản thời hạn hoàn trả vào hợp đồng với đơn vị NTP</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-row">
+      <div class="step-left">
+        <div class="step-dot sd4">4</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-content">
+        <div class="step-timing">THÁNG 3 (90 NGÀY)</div>
+        <div class="step-title">KPI cá nhân + văn hóa hoàn thành đúng hạn</div>
+        <div class="step-body">Bền vững bằng văn hóa, không phải chỉ bằng quy trình. Khi mọi người thấy kết quả của mình công khai, họ tự có động lực.</div>
+        <div class="step-actions">
+          <div class="action-item highlight"><div class="action-dot"></div><div>Công khai <strong>bảng xếp hạng hiệu suất</strong> hàng tuần: % hoàn thành đúng SLA theo người TH</div></div>
+          <div class="action-item highlight"><div class="action-dot"></div><div>Ghi nhận tháng: cán bộ có tỉ lệ đúng hạn cao nhất được ghi vào báo cáo tháng</div></div>
+          <div class="action-item"><div class="action-dot"></div><div>Review quy trình mỗi quý: dữ liệu nào thay đổi → điều chỉnh SLA</div></div>
+          <div class="action-item"><div class="action-dot"></div><div>Mục tiêu Q3/2026: BGSP ≥ 85%, không có phiếu tồn quá 14 ngày</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-row">
+      <div class="step-left">
+        <div class="step-dot sd5">5</div>
+      </div>
+      <div class="step-content">
+        <div class="step-timing">DÀI HẠN</div>
+        <div class="step-title">Tích hợp vào hệ thống quản lý — PNT "tự chạy"</div>
+        <div class="step-body">Khi 3 trụ cột Ownership + Deadline + Visibility được cài vào hệ thống phần mềm, PNT sẽ vận hành tốt mà không cần lãnh đạo phải đốc thúc từng ngày.</div>
+        <div class="step-actions">
+          <div class="action-item"><div class="action-dot"></div><div>Tích hợp notification vào app/phần mềm nội bộ</div></div>
+          <div class="action-item"><div class="action-dot"></div><div>Luồng phê duyệt BGSP số hóa: không cần ký giấy, click xác nhận trên hệ thống</div></div>
+          <div class="action-item"><div class="action-dot"></div><div>Dashboard lãnh đạo real-time: nhìn vào thấy ngay đội đang ở đâu</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- So sánh trước/sau -->
+  <div class="eyebrow">Trước và sau khi áp dụng giải pháp</div>
+  <div class="compare">
+    <div class="compare-col old">
+      <div class="compare-head">❌ Quy trình hiện tại</div>
+      <div class="compare-list">
+        <div class="ci"><div class="ci-dot">✕</div><div class="ci-text"><strong>1.368 phiếu không có người chịu trách nhiệm</strong> — tồn vô thời hạn</div></div>
+        <div class="ci"><div class="ci-dot">✕</div><div class="ci-text">Bước BGSP không được giao cho ai — <strong>người giao BGSP trống</strong> toàn bộ</div></div>
+        <div class="ci"><div class="ci-dot">✕</div><div class="ci-text">Không có SLA — phiếu tồn <strong>137 ngày</strong> không ai biết</div></div>
+        <div class="ci"><div class="ci-dot">✕</div><div class="ci-text">Phát hiện vấn đề khi <strong>xuất báo cáo định kỳ</strong> — quá muộn</div></div>
+        <div class="ci"><div class="ci-dot">✕</div><div class="ci-text">NTP không trả đúng hạn — <strong>không có chế tài</strong></div></div>
+        <div class="ci"><div class="ci-dot">✕</div><div class="ci-text">585 phiếu "không thực hiện" vẫn bị tính vào tồn đọng — <strong>số liệu ảo</strong></div></div>
+        <div class="ci"><div class="ci-dot">✕</div><div class="ci-text">BGSP Q2 đang giảm xuống <strong>26,5%</strong> — xu hướng tiêu cực</div></div>
+      </div>
+    </div>
+    <div class="compare-col new">
+      <div class="compare-head">✅ Sau khi áp dụng 3 trụ cột</div>
+      <div class="compare-list">
+        <div class="ci"><div class="ci-dot">✓</div><div class="ci-text"><strong>100% phiếu có người chịu trách nhiệm</strong> ngay từ lúc tạo</div></div>
+        <div class="ci"><div class="ci-dot">✓</div><div class="ci-text">Bước BGSP được <strong>giao tự động</strong> cho người khởi tạo PNT</div></div>
+        <div class="ci"><div class="ci-dot">✓</div><div class="ci-text">SLA rõ ràng theo địa điểm: <strong>3–7–14 ngày</strong> sau ra GCN</div></div>
+        <div class="ci"><div class="ci-dot">✓</div><div class="ci-text">Cảnh báo 4 cấp tự động — <strong>phát hiện ngay ngày đầu tiên</strong> quá hạn</div></div>
+        <div class="ci"><div class="ci-dot">✓</div><div class="ci-text">NTP có <strong>điều khoản hợp đồng</strong> và quy trình đốc thúc định kỳ</div></div>
+        <div class="ci"><div class="ci-dot">✓</div><div class="ci-text">Phiếu ngoại lệ được đóng đúng quy trình — <strong>số liệu sạch</strong></div></div>
+        <div class="ci"><div class="ci-dot">✓</div><div class="ci-text">Mục tiêu BGSP Q3 = <strong>85%+</strong>, không phiếu tồn quá 14 ngày</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI mục tiêu -->
+  <div class="eyebrow">KPI mục tiêu — Đo lường từng tháng</div>
+  <div class="kpi-grid">
+    <div class="kpi-card kt">
+      <div class="kpi-label">Hiện tại (cần biết)</div>
+      <div class="kpi-current">42%</div>
+      <div class="kpi-desc">Tỉ lệ BGSP toàn bộ Q1–Q2. Q2 chỉ đạt 26,5% — đang giảm.</div>
+    </div>
+    <div class="kpi-card k1">
+      <div class="kpi-label">Phiếu không có người TH</div>
+      <div class="kpi-current">1.368</div>
+      <div class="kpi-target">→ 0 trong tuần này</div>
+      <div class="kpi-desc">Phân công ngay hôm nay. Không để tồn sang tuần sau.</div>
+    </div>
+    <div class="kpi-card k2">
+      <div class="kpi-label">Tỉ lệ BGSP — Tháng 1</div>
+      <div class="kpi-current">42%</div>
+      <div class="kpi-target">→ Mục tiêu 65%</div>
+      <div class="kpi-desc">Sau khi giao 3.235 GCN sẵn sàng. Tăng 23 điểm %.</div>
+    </div>
+    <div class="kpi-card k3">
+      <div class="kpi-label">Tỉ lệ BGSP — Tháng 2</div>
+      <div class="kpi-current">65%</div>
+      <div class="kpi-target">→ Mục tiêu 75%</div>
+      <div class="kpi-desc">Sau khi xử lý NTP + đóng phiếu ngoại lệ + cảnh báo tự động.</div>
+    </div>
+    <div class="kpi-card k4">
+      <div class="kpi-label">Tỉ lệ BGSP — Q3</div>
+      <div class="kpi-current">75%</div>
+      <div class="kpi-target">→ Mục tiêu 85%+</div>
+      <div class="kpi-desc">Khi quy trình 3 trụ cột vận hành ổn định, KPI cá nhân có hiệu lực.</div>
+    </div>
+    <div class="kpi-card k5">
+      <div class="kpi-label">Phiếu tồn quá 14 ngày</div>
+      <div class="kpi-current">92+</div>
+      <div class="kpi-target">→ Mục tiêu 0</div>
+      <div class="kpi-desc">Với hệ thống cảnh báo 4 cấp, không phiếu nào được bỏ quên quá 14 ngày.</div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <div style="margin-bottom: 8px;">ManLab · Phân Tích Phiếu Nhận Trả PTĐ · 30/06/2026</div>
+  <div>
+    <a href="index.html">Trang chủ</a>
+    <a href="phieu_nhan_tra_dashboard.html">Bảng điều hành</a>
+    <a href="phan_tich_nguyen_nhan_pnt.html">Phân tích nguyên nhân</a>
+  </div>
+</footer>
+
+</body>
+</html>

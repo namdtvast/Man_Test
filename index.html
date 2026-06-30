@@ -12,7 +12,7 @@
     min-height: 100vh; display: flex; align-items: center; justify-content: center;
     padding: 32px 16px;
   }
-  .wrap { max-width: 560px; width: 100%; }
+  .wrap { max-width: 580px; width: 100%; }
   .logo {
     width: 48px; height: 48px; background: #D97706; border-radius: 8px;
     display: flex; align-items: center; justify-content: center;
@@ -20,21 +20,35 @@
   }
   h1 { font-size: 22px; font-weight: 800; color: #1A3260; margin-bottom: 6px; }
   .sub { font-size: 13px; color: #6B7280; margin-bottom: 32px; line-height: 1.6; }
-  .cards { display: flex; flex-direction: column; gap: 14px; }
+  .section-label {
+    font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+    color: #9CA3AF; margin-bottom: 10px; margin-top: 24px;
+    padding-bottom: 6px; border-bottom: 1px solid #D1DAE8;
+  }
+  .section-label:first-of-type { margin-top: 0; }
+  .cards { display: flex; flex-direction: column; gap: 12px; margin-bottom: 4px; }
   .card {
     background: #fff; border: 1px solid #D1DAE8; border-radius: 8px;
-    padding: 20px 22px; text-decoration: none; color: inherit;
+    padding: 18px 20px; text-decoration: none; color: inherit;
     border-left: 5px solid transparent;
     transition: box-shadow .15s, transform .15s;
     display: block;
   }
-  .card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.08); transform: translateY(-1px); }
+  .card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.09); transform: translateY(-1px); }
   .card.c1 { border-left-color: #2563EB; }
   .card.c2 { border-left-color: #D97706; }
-  .card-label { font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #9CA3AF; margin-bottom: 6px; }
-  .card-title { font-size: 15px; font-weight: 700; color: #1A1F2E; margin-bottom: 6px; }
+  .card.c3 { border-left-color: #16A34A; }
+  .card-label { font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #9CA3AF; margin-bottom: 5px; }
+  .card-title { font-size: 15px; font-weight: 700; color: #1A1F2E; margin-bottom: 5px; }
   .card-desc { font-size: 12px; color: #6B7280; line-height: 1.6; }
   .card-arrow { float: right; color: #9CA3AF; font-size: 18px; margin-top: -2px; }
+  .card.featured { border: 2px solid #16A34A; border-left: 5px solid #16A34A; background: #F0FDF4; }
+  .badge {
+    display: inline-block; font-size: 10px; font-weight: 700;
+    letter-spacing: .06em; padding: 2px 8px; border-radius: 3px;
+    background: #D1FAE5; color: #065F46; margin-left: 8px;
+    vertical-align: middle;
+  }
   .footer { text-align: center; font-size: 11px; color: #9CA3AF; margin-top: 28px; }
 </style>
 </head>
@@ -43,6 +57,18 @@
   <div class="logo">PTĐ</div>
   <h1>Phân Tích Phiếu Nhận Trả</h1>
   <p class="sub">Chi tiết tình trạng PTĐ / Mẫu &amp; Bàn giao sản phẩm<br>Dữ liệu Q1–Q2 / 2026 &nbsp;·&nbsp; 10.756 phiếu</p>
+
+  <div class="section-label">Giải pháp</div>
+  <div class="cards">
+    <a class="card c3 featured" href="giai-phap.html">
+      <span class="card-arrow">→</span>
+      <div class="card-label">Báo cáo 03 <span class="badge">MỚI</span></div>
+      <div class="card-title">Giải Pháp Nâng Cao Hiệu Quả PNT</div>
+      <div class="card-desc">3 trụ cột: Ownership – Deadline – Visibility. Lộ trình 30/60/90 ngày, SOP theo từng loại yêu cầu, hệ thống cảnh báo 4 cấp và KPI mục tiêu cụ thể.</div>
+    </a>
+  </div>
+
+  <div class="section-label" style="margin-top:20px;">Phân tích dữ liệu</div>
   <div class="cards">
     <a class="card c1" href="phieu_nhan_tra_dashboard.html">
       <span class="card-arrow">→</span>
@@ -53,10 +79,11 @@
     <a class="card c2" href="phan_tich_nguyen_nhan_pnt.html">
       <span class="card-arrow">→</span>
       <div class="card-label">Báo cáo 02</div>
-      <div class="card-title">Phân Tích Nguyên Nhân &amp; Giải Pháp</div>
-      <div class="card-desc">6 nguyên nhân gốc rễ, khó khăn vướng mắc theo từng nhóm, 8 giải pháp và ma trận ưu tiên hành động.</div>
+      <div class="card-title">Phân Tích Nguyên Nhân &amp; Vướng Mắc</div>
+      <div class="card-desc">6 nguyên nhân gốc rễ, khó khăn theo từng nhóm, 8 giải pháp và ma trận ưu tiên hành động.</div>
     </a>
   </div>
+
   <div class="footer">ManLab · DMC &nbsp;·&nbsp; 30/06/2026</div>
 </div>
 </body>
