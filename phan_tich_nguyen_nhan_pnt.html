@@ -1,0 +1,934 @@
+<title>Phân Tích Nguyên Nhân – Phiếu Nhận Trả PTĐ</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --navy:   #1A3260;
+    --blue:   #2563EB;
+    --sky:    #3B82F6;
+    --amber:  #D97706;
+    --red:    #B91C1C;
+    --teal:   #0F766E;
+    --purple: #7C3AED;
+    --bg:     #F1F5FB;
+    --surf:   #FFFFFF;
+    --border: #D1DAE8;
+    --text:   #111827;
+    --muted:  #4B5563;
+    --light:  #9CA3AF;
+  }
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.6; }
+
+  /* Header */
+  header {
+    background: var(--navy);
+    padding: 0 36px;
+    height: 58px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 3px solid var(--amber);
+    position: sticky; top: 0; z-index: 200;
+  }
+  .h-left { display: flex; align-items: center; gap: 14px; }
+  .h-logo { width: 34px; height: 34px; background: var(--amber); border-radius: 5px; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:13px; color:var(--navy); }
+  .h-title { font-size: 13px; font-weight: 700; color: #E2E8F0; letter-spacing:.04em; text-transform:uppercase; }
+  .h-sub   { font-size: 11px; color: #718096; margin-top:1px; }
+  .h-date  { font-size: 12px; color: #718096; }
+
+  /* Nav tabs */
+  nav {
+    background: var(--surf);
+    border-bottom: 1px solid var(--border);
+    padding: 0 36px;
+    display: flex; gap: 0;
+    position: sticky; top: 58px; z-index: 100;
+  }
+  .tab {
+    padding: 13px 20px 11px;
+    font-size: 12px; font-weight: 600;
+    color: var(--muted); cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: color .15s, border-color .15s;
+    white-space: nowrap;
+    user-select: none;
+  }
+  .tab:hover { color: var(--blue); }
+  .tab.active { color: var(--blue); border-bottom-color: var(--blue); }
+
+  /* Layout */
+  main { max-width: 1160px; margin: 0 auto; padding: 32px 24px 72px; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .section-eyebrow {
+    font-size: 10px; font-weight: 700; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--light);
+    margin-bottom: 14px; margin-top: 36px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-eyebrow::after { content:''; flex:1; height:1px; background:var(--border); }
+  .section-eyebrow:first-child { margin-top: 0; }
+
+  /* Summary banner */
+  .banner {
+    background: linear-gradient(135deg, #1A3260 0%, #1E4080 100%);
+    border-radius: 8px; padding: 24px 28px;
+    display: grid; grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 24px; margin-bottom: 4px;
+    border: 1px solid #243A6A;
+  }
+  .bn-item {}
+  .bn-label { font-size: 10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#7A92B8; margin-bottom:6px; }
+  .bn-val   { font-size: 28px; font-weight:800; color:#fff; font-variant-numeric:tabular-nums; line-height:1; }
+  .bn-sub   { font-size:11px; color:#8FA8CC; margin-top:5px; }
+  .bn-item.alert .bn-val { color: #FCD34D; }
+  .bn-item.crit  .bn-val { color: #FCA5A5; }
+
+  /* Card */
+  .card { background: var(--surf); border: 1px solid var(--border); border-radius: 7px; overflow:hidden; margin-bottom: 16px; }
+  .card-h { padding: 14px 20px 13px; border-bottom: 1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+  .card-h h3 { font-size: 13px; font-weight: 700; }
+  .card-h .badge { font-size:10px; font-weight:700; padding:3px 9px; border-radius:3px; letter-spacing:.04em; }
+  .b-red    { background:#FEE2E2; color:#991B1B; }
+  .b-amber  { background:#FEF3C7; color:#92400E; }
+  .b-blue   { background:#DBEAFE; color:#1E40AF; }
+  .b-teal   { background:#CCFBF1; color:#134E4A; }
+  .b-purple { background:#EDE9FE; color:#5B21B6; }
+  .b-gray   { background:#F3F4F6; color:#374151; }
+  .card-b { padding: 18px 20px; }
+
+  /* Grid */
+  .g2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .g3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; }
+
+  /* Cause block */
+  .cause-list { display:flex; flex-direction:column; gap:12px; }
+  .cause {
+    border-radius:6px; overflow:hidden;
+    display:grid; grid-template-columns: 5px 1fr;
+    border: 1px solid var(--border);
+  }
+  .cause-stripe { }
+  .c1 .cause-stripe { background:#B91C1C; }
+  .c2 .cause-stripe { background:#D97706; }
+  .c3 .cause-stripe { background:#7C3AED; }
+  .c4 .cause-stripe { background:#2563EB; }
+  .c5 .cause-stripe { background:#0F766E; }
+  .c6 .cause-stripe { background:#6B7280; }
+  .cause-body { padding:14px 16px; background:var(--surf); }
+  .cause-head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:6px; }
+  .cause-title { font-size:13px; font-weight:700; }
+  .cause-tag { flex-shrink:0; font-size:10px; font-weight:700; letter-spacing:.05em; padding:3px 9px; border-radius:3px; }
+  .cause-desc { font-size:12px; color:var(--muted); line-height:1.7; }
+  .cause-data { margin-top:10px; display:flex; gap:20px; flex-wrap:wrap; }
+  .cd-item { }
+  .cd-num  { font-size:18px; font-weight:800; font-variant-numeric:tabular-nums; }
+  .cd-lbl  { font-size:10px; color:var(--light); font-weight:600; letter-spacing:.05em; text-transform:uppercase; }
+  .num-red    { color:var(--red); }
+  .num-amber  { color:var(--amber); }
+  .num-blue   { color:var(--blue); }
+  .num-purple { color:var(--purple); }
+  .num-teal   { color:var(--teal); }
+
+  /* Difficulty accordion */
+  .diff-list { display:flex; flex-direction:column; gap:8px; }
+  .diff {
+    border: 1px solid var(--border);
+    border-radius:6px; overflow:hidden;
+    background: var(--surf);
+  }
+  .diff-head {
+    padding:13px 16px;
+    display:flex; align-items:center; gap:12px;
+    cursor:pointer; user-select:none;
+  }
+  .diff-head:hover { background:#FAFBFD; }
+  .diff-icon { width:28px; height:28px; border-radius:5px; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:13px; font-weight:800; }
+  .diff-icon.d1 { background:#FEE2E2; color:#991B1B; }
+  .diff-icon.d2 { background:#FEF3C7; color:#92400E; }
+  .diff-icon.d3 { background:#EDE9FE; color:#5B21B6; }
+  .diff-icon.d4 { background:#DBEAFE; color:#1E40AF; }
+  .diff-icon.d5 { background:#F3F4F6; color:#374151; }
+  .diff-icon.d6 { background:#CCFBF1; color:#134E4A; }
+  .diff-title { flex:1; font-size:13px; font-weight:600; }
+  .diff-count { font-size:12px; font-variant-numeric:tabular-nums; color:var(--muted); }
+  .diff-arrow { font-size:11px; color:var(--light); transition:transform .2s; }
+  .diff.open .diff-arrow { transform:rotate(180deg); }
+  .diff-content { display:none; padding:0 16px 14px 56px; font-size:12px; color:var(--muted); line-height:1.8; border-top:1px solid #F3F4F6; }
+  .diff.open .diff-content { display:block; }
+  .diff-content ul { padding-left:16px; }
+  .diff-content li { margin-bottom:4px; }
+  .diff-content strong { color:var(--text); }
+
+  /* Solutions */
+  .sol-grid { display:flex; flex-direction:column; gap:14px; }
+  .sol {
+    border-radius:7px; overflow:hidden;
+    display:grid; grid-template-columns:6px 1fr;
+    border:1px solid var(--border);
+  }
+  .sol-stripe { }
+  .s1 .sol-stripe { background:var(--blue); }
+  .s2 .sol-stripe { background:var(--amber); }
+  .s3 .sol-stripe { background:var(--teal); }
+  .s4 .sol-stripe { background:var(--purple); }
+  .s5 .sol-stripe { background:var(--red); }
+  .s6 .sol-stripe { background:#059669; }
+  .sol-inner { background:var(--surf); padding:18px 20px; }
+  .sol-head { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:8px; gap:14px; }
+  .sol-num { font-size:11px; font-weight:800; color:var(--light); letter-spacing:.06em; margin-bottom:3px; }
+  .sol-title { font-size:14px; font-weight:700; color:var(--text); }
+  .sol-timing { font-size:10px; font-weight:700; letter-spacing:.06em; padding:4px 10px; border-radius:3px; flex-shrink:0; }
+  .t-now   { background:#FEE2E2; color:#991B1B; }
+  .t-week  { background:#FEF3C7; color:#92400E; }
+  .t-month { background:#DBEAFE; color:#1E40AF; }
+  .t-long  { background:#F3F4F6; color:#374151; }
+  .sol-problem { font-size:11px; font-weight:600; color:var(--light); text-transform:uppercase; letter-spacing:.06em; margin-bottom:4px; }
+  .sol-desc { font-size:12px; color:var(--muted); line-height:1.75; }
+  .sol-steps { margin-top:12px; display:flex; flex-direction:column; gap:5px; }
+  .step { display:flex; gap:10px; align-items:flex-start; font-size:12px; }
+  .step-n { width:20px; height:20px; border-radius:50%; background:var(--bg); color:var(--muted); display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; flex-shrink:0; margin-top:1px; }
+  .step-text { flex:1; color:var(--muted); line-height:1.6; }
+  .step-text strong { color:var(--text); }
+  .sol-kpi { margin-top:14px; display:flex; gap:20px; flex-wrap:wrap; padding-top:12px; border-top:1px solid #F3F4F6; }
+  .kpi-chip { }
+  .kpi-label { font-size:10px; color:var(--light); font-weight:600; letter-spacing:.06em; text-transform:uppercase; }
+  .kpi-val   { font-size:13px; font-weight:700; color:var(--text); }
+
+  /* Priority matrix */
+  .matrix { width:100%; border-collapse:collapse; }
+  .matrix th { font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--light); padding:0 14px 12px; text-align:left; border-bottom:2px solid var(--border); }
+  .matrix td { padding:11px 14px; border-bottom:1px solid #F3F4F6; font-size:12px; font-variant-numeric:tabular-nums; vertical-align:top; }
+  .matrix tr:last-child td { border:none; }
+  .matrix tr:hover td { background:#FAFBFD; }
+  .matrix .num { font-weight:700; }
+  .pill { display:inline-block; font-size:10px; font-weight:700; letter-spacing:.04em; padding:3px 9px; border-radius:3px; }
+  .p-now    { background:#FEE2E2; color:#991B1B; }
+  .p-week   { background:#FEF3C7; color:#92400E; }
+  .p-month  { background:#DBEAFE; color:#1E40AF; }
+  .p-long   { background:#F3F4F6; color:#4B5563; }
+  .p-ok     { background:#D1FAE5; color:#065F46; }
+
+  /* Flow diagram */
+  .flow { display:flex; flex-direction:column; gap:4px; }
+  .flow-row { display:flex; gap:4px; align-items:stretch; }
+  .flow-node {
+    border-radius:5px; padding:10px 14px;
+    font-size:11px; font-weight:600; flex:1; position:relative;
+  }
+  .fn-ok     { background:#D1FAE5; color:#065F46; border:1px solid #6EE7B7; }
+  .fn-warn   { background:#FEF3C7; color:#92400E; border:1px solid #FCD34D; }
+  .fn-block  { background:#FEE2E2; color:#991B1B; border:1px solid #FCA5A5; }
+  .fn-skip   { background:#F9FAFB; color:#9CA3AF; border:1px solid #E5E7EB; }
+  .flow-node .fn-count { font-size:16px; font-weight:800; font-variant-numeric:tabular-nums; display:block; margin-bottom:2px; }
+  .flow-node .fn-pct { font-size:10px; font-weight:600; opacity:.7; }
+  .flow-arrow { display:flex; align-items:center; justify-content:center; color:var(--light); font-size:18px; padding:0 4px; }
+  .flow-label { font-size:10px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--light); margin-bottom:4px; }
+
+  /* Stat row */
+  .stat-row { display:flex; gap:14px; }
+  .stat { flex:1; background:var(--bg); border-radius:5px; padding:12px 14px; }
+  .stat-val { font-size:22px; font-weight:800; font-variant-numeric:tabular-nums; line-height:1; }
+  .stat-lbl { font-size:11px; color:var(--muted); margin-top:4px; }
+
+  /* Table small */
+  .t-sm { width:100%; border-collapse:collapse; }
+  .t-sm th { font-size:10px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--light); padding:0 10px 10px; text-align:left; border-bottom:1px solid var(--border); }
+  .t-sm td { padding:9px 10px; border-bottom:1px solid #F3F4F6; font-size:12px; }
+  .t-sm tr:last-child td { border:none; }
+  .bar-mini { display:flex; align-items:center; gap:6px; }
+  .bm-track { flex:1; background:#F3F4F6; border-radius:2px; height:4px; }
+  .bm-fill  { height:100%; border-radius:2px; }
+  .fill-r { background:var(--red); }
+  .fill-a { background:var(--amber); }
+  .fill-b { background:var(--blue); }
+  .fill-t { background:var(--teal); }
+
+  @media(max-width:760px) {
+    .banner { grid-template-columns:1fr 1fr; }
+    .g2,.g3 { grid-template-columns:1fr; }
+    nav { overflow-x:auto; }
+  }
+</style>
+
+<header>
+  <div class="h-left">
+    <div class="h-logo">PTĐ</div>
+    <div>
+      <div class="h-title">Phân Tích Nguyên Nhân — Phiếu Nhận Trả</div>
+      <div class="h-sub">Vướng mắc, khó khăn và giải pháp hoàn thành PNT</div>
+    </div>
+  </div>
+  <div class="h-date">30/06/2026 &nbsp;·&nbsp; 10.756 phiếu</div>
+</header>
+
+<nav>
+  <div class="tab active" onclick="switchTab('overview')">Tổng quan</div>
+  <div class="tab" onclick="switchTab('causes')">Nguyên nhân</div>
+  <div class="tab" onclick="switchTab('difficulties')">Khó khăn &amp; Vướng mắc</div>
+  <div class="tab" onclick="switchTab('solutions')">Giải pháp</div>
+  <div class="tab" onclick="switchTab('priority')">Ma trận ưu tiên</div>
+</nav>
+
+<main>
+
+<!-- ════ TAB: OVERVIEW ════ -->
+<div class="panel active" id="panel-overview">
+
+  <div class="section-eyebrow">Bức tranh tổng thể</div>
+  <div class="banner">
+    <div class="bn-item">
+      <div class="bn-label">Tổng phiếu</div>
+      <div class="bn-val">10.756</div>
+      <div class="bn-sub">Q1–Q2 / 2026</div>
+    </div>
+    <div class="bn-item alert">
+      <div class="bn-label">Chưa trả PTĐ</div>
+      <div class="bn-val">392</div>
+      <div class="bn-sub">Tồn đọng ngay hôm nay</div>
+    </div>
+    <div class="bn-item alert">
+      <div class="bn-label">Chưa BGSP (GCN)</div>
+      <div class="bn-val">6.266</div>
+      <div class="bn-sub">58% chưa hoàn tất</div>
+    </div>
+    <div class="bn-item crit">
+      <div class="bn-label">Chưa có người TH</div>
+      <div class="bn-val">1.368</div>
+      <div class="bn-sub">Phiếu không có chủ</div>
+    </div>
+  </div>
+
+  <div class="section-eyebrow" style="margin-top:28px;">Vòng đời phiếu — phân tầng 4 giai đoạn</div>
+  <div class="card">
+    <div class="card-b">
+      <div class="flow-label">Giai đoạn xử lý (theo số phiếu hoàn thành từng bước)</div>
+      <div class="flow" style="gap:6px;">
+        <div class="flow-row">
+          <div class="flow-node fn-ok">
+            <span class="fn-count">8.388</span>
+            <span>Đã nhận PTĐ / Mẫu (BT)</span>
+            <span class="fn-pct">78%</span>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node fn-ok">
+            <span class="fn-count">8.887</span>
+            <span>Đã trả PTĐ / Mẫu</span>
+            <span class="fn-pct">83%</span>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node fn-warn">
+            <span class="fn-count">8.224</span>
+            <span>Đã trả BBĐL</span>
+            <span class="fn-pct">76%</span>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node fn-block">
+            <span class="fn-count">4.490</span>
+            <span>Đã BGSP / Có GCN ← NÚT THẮT</span>
+            <span class="fn-pct">42%</span>
+          </div>
+        </div>
+      </div>
+      <p style="font-size:11px;color:var(--light);margin-top:12px;">Ghi chú: Các bước không phải chuỗi tuyến tính nghiêm ngặt (nhiều loại yêu cầu có quy trình khác nhau), nhưng bước BGSP vẫn là điểm rơi rõ nhất.</p>
+    </div>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="card-h"><h3>Phân loại 6.266 phiếu chưa BGSP</h3></div>
+      <div class="card-b">
+        <div class="stat-row">
+          <div class="stat">
+            <div class="stat-val" style="color:var(--amber)">3.752</div>
+            <div class="stat-lbl">Sẵn sàng BGSP<br><small>(PTĐ đã trả + BBĐL đã trả)<br>— chỉ thiếu hành động giao GCN</small></div>
+          </div>
+          <div class="stat">
+            <div class="stat-val" style="color:var(--red)">2.514</div>
+            <div class="stat-lbl">Chưa đủ điều kiện<br><small>(PTĐ hoặc BBĐL vẫn đang<br>trong quá trình xử lý)</small></div>
+          </div>
+        </div>
+        <p style="font-size:12px;color:var(--muted);margin-top:14px;line-height:1.7;">
+          <strong style="color:var(--amber)">3.752 phiếu</strong> đã hoàn thành cả hai bước trả PTĐ và trả BBĐL nhưng GCN chưa được bàn giao vật lý. Trong đó <strong>3.235 phiếu đã có số GCN</strong> — nghĩa là chứng nhận đã ra nhưng chưa trao tay khách hàng.
+        </p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-h"><h3>Phân tích theo loại yêu cầu thực hiện</h3></div>
+      <div class="card-b">
+        <table class="t-sm">
+          <thead><tr><th>Loại</th><th>Chưa BGSP</th><th>Sẵn sàng</th><th>Tỉ lệ sẵn sàng</th></tr></thead>
+          <tbody>
+            <tr><td><strong>HC – Hiệu chuẩn</strong></td><td class="num" style="color:var(--red)">2.758</td><td>2.017</td><td><div class="bar-mini"><div class="bm-track"><div class="bm-fill fill-t" style="width:73%"></div></div><span>73%</span></div></td></tr>
+            <tr><td><strong>KĐ – Kiểm định</strong></td><td class="num" style="color:var(--amber)">1.066</td><td>721</td><td><div class="bar-mini"><div class="bm-track"><div class="bm-fill fill-t" style="width:68%"></div></div><span>68%</span></div></td></tr>
+            <tr><td><strong>NTP (RA)</strong></td><td class="num" style="color:var(--amber)">1.106</td><td>146</td><td><div class="bar-mini"><div class="bm-track"><div class="bm-fill fill-a" style="width:13%"></div></div><span>13%</span></div></td></tr>
+            <tr><td><strong>KĐTN</strong></td><td class="num">559</td><td>555</td><td><div class="bar-mini"><div class="bm-track"><div class="bm-fill fill-t" style="width:99%"></div></div><span>99%</span></div></td></tr>
+            <tr><td><strong>ĐGHT</strong></td><td class="num">199</td><td>91</td><td><div class="bar-mini"><div class="bm-track"><div class="bm-fill fill-b" style="width:46%"></div></div><span>46%</span></div></td></tr>
+          </tbody>
+        </table>
+        <p style="font-size:11px;color:var(--muted);margin-top:12px;">KĐTN (kiểm định tại nơi sử dụng) có 99% sẵn sàng nhưng chưa ai giao — vấn đề thuần túy logistics. NTP (RA) chỉ 13% — phụ thuộc đơn vị ngoài.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ════ TAB: CAUSES ════ -->
+<div class="panel" id="panel-causes">
+
+  <div class="section-eyebrow">Phân tích nguyên nhân gốc rễ</div>
+  <p style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.7;">Dựa trên cấu trúc dữ liệu và phân tích các nhóm tồn đọng, có <strong>6 nhóm nguyên nhân chính</strong> khiến Phiếu Nhận Trả không được hoàn thành đúng hạn:</p>
+
+  <div class="cause-list">
+
+    <div class="cause c1">
+      <div class="cause-stripe"></div>
+      <div class="cause-body">
+        <div class="cause-head">
+          <div>
+            <div class="cause-title">① Thiếu người chịu trách nhiệm — 1.368 phiếu không có chủ</div>
+          </div>
+          <span class="cause-tag b-red">Nguyên nhân gốc rễ số 1</span>
+        </div>
+        <div class="cause-desc">
+          <strong>1.368 phiếu</strong> ghi nhận "Chưa có người thực hiện PTĐ" — không có cá nhân nào được phân công. Khi không có chủ thể chịu trách nhiệm, phiếu tồn đọng vô thời hạn. Đây là lỗ hổng quy trình phân công: hoặc không có bước giao việc bắt buộc khi tạo phiếu, hoặc người khởi tạo không gán người thực hiện ngay từ đầu.
+          <br><br>Trong nhóm 3.752 phiếu "sẵn sàng BGSP", vẫn còn <strong>317 phiếu không có người TH</strong> — tức là cả bước trả PTĐ, BBĐL đã xong nhưng không ai biết mình cần đi giao GCN.
+        </div>
+        <div class="cause-data">
+          <div class="cd-item"><div class="cd-num num-red">1.368</div><div class="cd-lbl">Phiếu không có người TH</div></div>
+          <div class="cd-item"><div class="cd-num num-red">317</div><div class="cd-lbl">Trong đó sẵn sàng BGSP nhưng vẫn không có chủ</div></div>
+          <div class="cd-item"><div class="cd-num num-red">13%</div><div class="cd-lbl">Tổng phiếu bị ảnh hưởng</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cause c2">
+      <div class="cause-stripe"></div>
+      <div class="cause-body">
+        <div class="cause-head">
+          <div>
+            <div class="cause-title">② Tắc nghẽn bàn giao GCN — Có chứng nhận nhưng không giao</div>
+          </div>
+          <span class="cause-tag b-amber">Nguyên nhân số 2</span>
+        </div>
+        <div class="cause-desc">
+          <strong>3.235 trong 3.752 phiếu</strong> sẵn sàng đã có số GCN nhưng vẫn chưa BGSP. Nghĩa là giấy chứng nhận đã ra, PTĐ đã trả, BBĐL đã trả — nhưng không ai thực hiện bước bàn giao cuối cùng.
+          <br><br>Nguyên nhân con: <strong>(a)</strong> Quy trình đóng phiếu cuối chưa được chuẩn hóa — cán bộ không biết mình phải kích hoạt bước BGSP; <strong>(b)</strong> Bàn giao GCN thường phụ thuộc lịch đến của khách hàng; <strong>(c)</strong> Với địa điểm hiện trường (2.204 phiếu chưa BGSP), việc chuyển GCN vật lý về khách hàng còn gặp khó về logistics.
+        </div>
+        <div class="cause-data">
+          <div class="cd-item"><div class="cd-num num-amber">3.235</div><div class="cd-lbl">Có số GCN nhưng chưa bàn giao</div></div>
+          <div class="cd-item"><div class="cd-num num-amber">86%</div><div class="cd-lbl">Trong nhóm sẵn sàng đã có GCN</div></div>
+          <div class="cd-item"><div class="cd-num num-amber">2.204</div><div class="cd-lbl">Phiếu hiện trường chưa BGSP</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cause c3">
+      <div class="cause-stripe"></div>
+      <div class="cause-body">
+        <div class="cause-head">
+          <div>
+            <div class="cause-title">③ NTP chưa hoàn trả — Phụ thuộc đơn vị ngoài, mất kiểm soát</div>
+          </div>
+          <span class="cause-tag b-purple">Nguyên nhân số 3</span>
+        </div>
+        <div class="cause-desc">
+          Nhóm <strong>NTP (RA)</strong> có 1.106 phiếu chưa BGSP, trong đó <strong>390 phiếu chưa nhận được PTĐ từ đơn vị NTP</strong> và <strong>874 phiếu chưa có BBĐL trả về</strong>. Tỉ lệ sẵn sàng của NTP (RA) chỉ đạt 13% — thấp nhất toàn bộ.
+          <br><br>Vấn đề: đơn vị NTP ngoài (Navitek HCM, CLC HD, Vielab, HHCN...) không tuân thủ lịch trả PTĐ và BBĐL theo cam kết. Đây là phụ thuộc bên ngoài — không thể ép bằng nội quy nội bộ, cần hợp đồng rõ ràng và chế tài.
+        </div>
+        <div class="cause-data">
+          <div class="cd-item"><div class="cd-num num-purple">418</div><div class="cd-lbl">PTĐ chưa nhận lại từ NTP</div></div>
+          <div class="cd-item"><div class="cd-num num-purple">874</div><div class="cd-lbl">BBĐL chưa trả về từ NTP</div></div>
+          <div class="cd-item"><div class="cd-num num-purple">13%</div><div class="cd-lbl">Tỉ lệ sẵn sàng BGSP của NTP (RA)</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cause c4">
+      <div class="cause-stripe"></div>
+      <div class="cause-body">
+        <div class="cause-head">
+          <div>
+            <div class="cause-title">④ Phiếu "Không thực hiện" nhưng chưa đóng — Trạng thái lửng</div>
+          </div>
+          <span class="cause-tag b-blue">Nguyên nhân số 4</span>
+        </div>
+        <div class="cause-desc">
+          <strong>1.339 phiếu</strong> có tình trạng "Không thực hiện" (PTĐ hỏng, khách gửi lại sau, không đạt kiểm định, chờ sửa...) nhưng trong đó <strong>585 phiếu vẫn đang ở trạng thái "Chưa BGSP"</strong>.
+          <br><br>Đây là "phiếu chết" — không thể thực hiện được nhưng cũng chưa được chính thức đóng/hủy trong hệ thống. Chúng vẫn làm phồng con số tồn đọng và gây nhiễu báo cáo. Nguyên nhân: thiếu quy trình xử lý trường hợp ngoại lệ (phiếu không thực hiện được).
+        </div>
+        <div class="cause-data">
+          <div class="cd-item"><div class="cd-num num-blue">1.339</div><div class="cd-lbl">Phiếu không thực hiện</div></div>
+          <div class="cd-item"><div class="cd-num num-blue">585</div><div class="cd-lbl">Trong đó vẫn "Chưa BGSP"</div></div>
+          <div class="cd-item"><div class="cd-num num-blue">754</div><div class="cd-lbl">Đã đóng BGSP đúng</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cause c5">
+      <div class="cause-stripe"></div>
+      <div class="cause-body">
+        <div class="cause-head">
+          <div>
+            <div class="cause-title">⑤ Thiết bị tồn lâu — 92 phiếu quá 30 ngày chưa trả</div>
+          </div>
+          <span class="cause-tag b-teal">Nguyên nhân số 5</span>
+        </div>
+        <div class="cause-desc">
+          Trong 392 phiếu chưa trả PTĐ: <strong>72 phiếu tồn 31–60 ngày</strong>, <strong>20 phiếu tồn trên 60 ngày</strong> (max 137 ngày). Với phiếu đã nhận vào lab từ lâu mà vẫn chưa trả, có thể xảy ra các tình huống: PTĐ hỏng chờ sửa không có người theo dõi; PTĐ bị đặt nhầm vị trí trong kho; hoặc kết quả kiểm định đang chờ phê duyệt.
+          <br><br>Không có cơ chế cảnh báo tự động khi phiếu vượt ngưỡng thời gian là lý do chính khiến các trường hợp này bị bỏ quên.
+        </div>
+        <div class="cause-data">
+          <div class="cd-item"><div class="cd-num num-teal">20,3</div><div class="cd-lbl">Ngày tồn đọng TB (phiếu chưa trả)</div></div>
+          <div class="cd-item"><div class="cd-num num-teal">92</div><div class="cd-lbl">Phiếu tồn trên 30 ngày</div></div>
+          <div class="cd-item"><div class="cd-num num-teal">137</div><div class="cd-lbl">Ngày tồn đọng dài nhất</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cause c6">
+      <div class="cause-stripe"></div>
+      <div class="cause-body">
+        <div class="cause-head">
+          <div>
+            <div class="cause-title">⑥ Thiếu dữ liệu bàn giao BGSP — Người giao để trống</div>
+          </div>
+          <span class="cause-tag b-gray">Nguyên nhân số 6</span>
+        </div>
+        <div class="cause-desc">
+          Cột "Người giao (BGSP)" và "Ngày giao (BGSP)" hầu như trống toàn bộ trong nhóm 3.752 phiếu sẵn sàng. Điều này có nghĩa: bước BGSP chưa được ghi nhận vào hệ thống ngay cả khi có thể đã diễn ra ngoài thực tế, hoặc bước này hoàn toàn chưa xảy ra và không có ai nhận task đó. Dữ liệu không đủ để phân biệt "chưa làm" hay "làm rồi nhưng không cập nhật".
+        </div>
+        <div class="cause-data">
+          <div class="cd-item"><div class="cd-num" style="color:#6B7280">~0</div><div class="cd-lbl">Người giao BGSP được điền</div></div>
+          <div class="cd-item"><div class="cd-num" style="color:#6B7280">37,6%</div><div class="cd-lbl">Phiếu chưa BGSP cũng chưa có số GCN</div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════ TAB: DIFFICULTIES ════ -->
+<div class="panel" id="panel-difficulties">
+
+  <div class="section-eyebrow">Khó khăn &amp; Vướng mắc theo từng nhóm</div>
+
+  <div class="diff-list">
+
+    <div class="diff open">
+      <div class="diff-head" onclick="toggleDiff(this)">
+        <div class="diff-icon d1">1</div>
+        <div class="diff-title">Khó khăn vận hành: Phân công không rõ, không có cơ chế theo dõi</div>
+        <div class="diff-count">Ảnh hưởng: 1.368+ phiếu</div>
+        <div class="diff-arrow">▼</div>
+      </div>
+      <div class="diff-content">
+        <ul>
+          <li><strong>Không có bước phân công bắt buộc</strong> khi khởi tạo phiếu → người tạo phiếu không bị ràng buộc phải chọn người thực hiện.</li>
+          <li><strong>Không có dashboard tập trung</strong> cho phép lãnh đạo nhìn thấy ai đang ôm bao nhiêu việc, phiếu nào không có chủ.</li>
+          <li><strong>Phân bổ tải không đều</strong>: Nguyễn Trần Quốc Chung ôm 1.405 phiếu (gấp đôi người thứ ba) → nguy cơ nghẽn một người.</li>
+          <li><strong>Không có cảnh báo tự động</strong> khi phiếu tồn quá X ngày mà không có người TH.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="diff">
+      <div class="diff-head" onclick="toggleDiff(this)">
+        <div class="diff-icon d2">2</div>
+        <div class="diff-title">Khó khăn quy trình: Bước đóng BGSP không rõ điều kiện và người chịu trách nhiệm</div>
+        <div class="diff-count">Ảnh hưởng: 3.752 phiếu sẵn sàng</div>
+        <div class="diff-arrow">▼</div>
+      </div>
+      <div class="diff-content">
+        <ul>
+          <li><strong>Không rõ ai trigger bước BGSP</strong>: cán bộ TH PTĐ hay người khởi tạo hay bộ phận khác?</li>
+          <li><strong>GCN đã có (3.235 phiếu) nhưng chưa bàn giao</strong> → bước vật lý "trao tay khách hàng" không được hệ thống nhắc nhở.</li>
+          <li><strong>Bàn giao theo lịch khách</strong>: GCN chỉ được giao khi khách đến lấy → phụ thuộc lịch bên ngoài, không chủ động được.</li>
+          <li><strong>Với phiếu hiện trường</strong>: GCN phải chuyển về địa điểm thực hiện (2.204 phiếu) → logistics phức tạp, dễ trì hoãn.</li>
+          <li><strong>Không có SLA (Service Level Agreement)</strong> quy định thời gian tối đa từ ra GCN đến bàn giao → cán bộ không có áp lực thời gian.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="diff">
+      <div class="diff-head" onclick="toggleDiff(this)">
+        <div class="diff-icon d3">3</div>
+        <div class="diff-title">Vướng mắc với đơn vị NTP ngoài — mất kiểm soát tiến độ</div>
+        <div class="diff-count">Ảnh hưởng: 418 PTĐ + 874 BBĐL</div>
+        <div class="diff-arrow">▼</div>
+      </div>
+      <div class="diff-content">
+        <ul>
+          <li><strong>Đơn vị NTP (Navitek, CLC HD, Vielab, HHCN...)</strong> không cam kết trả PTĐ và BBĐL đúng hạn.</li>
+          <li><strong>418 thiết bị đang ở đơn vị NTP</strong> và chưa trả về — không rõ tiến độ thực hiện.</li>
+          <li><strong>Không có cơ chế nhắc nợ tự động</strong> với đơn vị ngoài — chỉ dựa vào liên lạc thủ công.</li>
+          <li><strong>BBĐL từ NTP về chậm</strong> (874 chưa trả) → block toàn bộ bước BGSP kể cả khi PTĐ đã xử lý xong.</li>
+          <li><strong>Không rõ điều khoản hợp đồng</strong> có quy định thời hạn hoàn trả không — nếu không có thì không có căn cứ đòi.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="diff">
+      <div class="diff-head" onclick="toggleDiff(this)">
+        <div class="diff-icon d4">4</div>
+        <div class="diff-title">Phiếu đặc thù (Không thực hiện, KĐTN, ĐGHT) thiếu luồng xử lý riêng</div>
+        <div class="diff-count">Ảnh hưởng: 1.924 phiếu</div>
+        <div class="diff-arrow">▼</div>
+      </div>
+      <div class="diff-content">
+        <ul>
+          <li><strong>"Không thực hiện" (1.339 phiếu)</strong>: Thiết bị hỏng, khách gửi lại, không đạt kiểm định — nhưng <strong>585 phiếu vẫn ở trạng thái "Chưa BGSP"</strong>, làm phình số liệu tồn đọng. Cần luồng "đóng phiếu ngoại lệ" riêng.</li>
+          <li><strong>KĐTN (559 phiếu)</strong>: Kiểm định tại nơi sử dụng — 99% đã sẵn sàng nhưng không ai giao GCN. Khác với PTN, KĐTN cần cán bộ ra tận nơi giao → tốn thời gian hơn, dễ bị trì hoãn.</li>
+          <li><strong>ĐGHT (273 phiếu)</strong>: Đánh giá hiện trường — cần phối hợp khách hàng tại chỗ, không thể giao GCN từ xa.</li>
+          <li><strong>Thiếu SOP riêng</strong> cho từng loại yêu cầu đặc thù → cán bộ xử lý theo kinh nghiệm, không nhất quán.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="diff">
+      <div class="diff-head" onclick="toggleDiff(this)">
+        <div class="diff-icon d5">5</div>
+        <div class="diff-title">Thiếu công cụ cảnh báo và theo dõi thời gian thực</div>
+        <div class="diff-count">Ảnh hưởng: toàn bộ 10.756 phiếu</div>
+        <div class="diff-arrow">▼</div>
+      </div>
+      <div class="diff-content">
+        <ul>
+          <li><strong>Không có hệ thống cảnh báo</strong> tự động khi phiếu vượt ngưỡng: 7 ngày chưa trả PTĐ, 30 ngày chưa BGSP...</li>
+          <li><strong>20 phiếu đã tồn trên 60 ngày</strong> (max 137 ngày) mà không có ai phát hiện — chỉ thấy khi xuất báo cáo.</li>
+          <li><strong>Lãnh đạo không có view real-time</strong> về tồn đọng → chỉ biết khi vấn đề đã lớn.</li>
+          <li><strong>Dữ liệu phân tán</strong>: thông tin nhận/trả/BGSP ở các cột khác nhau, không có "trạng thái tổng hợp" duy nhất cho từng phiếu.</li>
+          <li><strong>Không có KPI đo lường hiệu suất</strong> theo người thực hiện → không biết ai đang bị tắc nghẽn.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="diff">
+      <div class="diff-head" onclick="toggleDiff(this)">
+        <div class="diff-icon d6">6</div>
+        <div class="diff-title">Dữ liệu thiếu nhất quán — BBĐL và BGSP không được cập nhật đầy đủ</div>
+        <div class="diff-count">Ảnh hưởng: chất lượng báo cáo</div>
+        <div class="diff-arrow">▼</div>
+      </div>
+      <div class="diff-content">
+        <ul>
+          <li><strong>Cột "Người giao (BGSP)" trống gần toàn bộ</strong> trong nhóm chưa BGSP → không phân biệt được "chưa làm" hay "làm rồi nhưng quên cập nhật".</li>
+          <li><strong>2.357 phiếu chưa BGSP cũng chưa có số GCN</strong> (37,6%) → không rõ đang chờ gì: chờ kết quả, chờ phê duyệt hay chờ phát hành?</li>
+          <li><strong>Cập nhật hệ thống không kịp thực tế</strong>: một số thao tác vật lý (trả PTĐ, trả BBĐL) đã xảy ra nhưng cán bộ quét muộn, gây sai lệch báo cáo.</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════ TAB: SOLUTIONS ════ -->
+<div class="panel" id="panel-solutions">
+
+  <div class="section-eyebrow">Giải pháp — phân theo tầng thời gian</div>
+
+  <div class="sol-grid">
+
+    <div class="sol s1">
+      <div class="sol-stripe"></div>
+      <div class="sol-inner">
+        <div class="sol-head">
+          <div>
+            <div class="sol-num">GIẢI PHÁP 01 &nbsp;·&nbsp; NGAY HÔM NAY</div>
+            <div class="sol-title">Chiến dịch "Quét tồn" — xử lý 392 phiếu chưa trả PTĐ trong 5 ngày</div>
+          </div>
+          <span class="sol-timing t-now">Ngay hôm nay</span>
+        </div>
+        <div class="sol-problem">Giải quyết Nguyên nhân ⑤ — Thiết bị tồn lâu không có cảnh báo</div>
+        <div class="sol-desc">Trích xuất danh sách 392 phiếu, phân nhóm theo thời gian tồn và đơn vị. Giao việc trực tiếp (tên người + deadline cụ thể) cho từng đơn vị tồn nhiều nhất.</div>
+        <div class="sol-steps">
+          <div class="step"><div class="step-n">1</div><div class="step-text"><strong>Phân nhóm 392 phiếu</strong> theo 4 mức: &lt;7 ngày (144), 7–30 ngày (156), 31–60 ngày (72), &gt;60 ngày (20). Nhóm 31+ ngày xử lý trước.</div></div>
+          <div class="step"><div class="step-n">2</div><div class="step-text"><strong>Giao việc theo đơn vị</strong>: CEM_NBinh (60), Vicem_Thanhthang (32), Vicem_HoangMai (30), Cty_DAP_HP (29)... Mỗi đơn vị có người phụ trách + deadline ngày/giờ.</div></div>
+          <div class="step"><div class="step-n">3</div><div class="step-text"><strong>Báo cáo sáng–chiều</strong> mỗi ngày đến khi 392 = 0. Không cần họp — chỉ cần bảng trạng thái cập nhật real-time.</div></div>
+          <div class="step"><div class="step-n">4</div><div class="step-text">Riêng <strong>20 phiếu trên 60 ngày</strong>: lãnh đạo trực tiếp gọi điện xác nhận tình trạng thiết bị trước khi giao cán bộ xử lý.</div></div>
+        </div>
+        <div class="sol-kpi">
+          <div class="kpi-chip"><div class="kpi-label">Mục tiêu</div><div class="kpi-val">392 → 0 trong 5 ngày</div></div>
+          <div class="kpi-chip"><div class="kpi-label">Người chịu trách nhiệm</div><div class="kpi-val">Lãnh đạo phòng phân công trực tiếp</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sol s2">
+      <div class="sol-stripe"></div>
+      <div class="sol-inner">
+        <div class="sol-head">
+          <div>
+            <div class="sol-num">GIẢI PHÁP 02 &nbsp;·&nbsp; TRONG TUẦN</div>
+            <div class="sol-title">Phân công người thực hiện cho toàn bộ 1.368 phiếu trống</div>
+          </div>
+          <span class="sol-timing t-week">Trong tuần</span>
+        </div>
+        <div class="sol-problem">Giải quyết Nguyên nhân ① — Thiếu người chịu trách nhiệm</div>
+        <div class="sol-desc">Không có người TH = không có hành động. Đây là bước cơ bản nhất cần làm ngay.</div>
+        <div class="sol-steps">
+          <div class="step"><div class="step-n">1</div><div class="step-text"><strong>Lọc 1.368 phiếu</strong> trống người TH. Phân theo loại yêu cầu (HC/KĐ/NTP...) và địa điểm thực hiện.</div></div>
+          <div class="step"><div class="step-n">2</div><div class="step-text"><strong>Đối chiếu tải</strong>: Nguyễn Trần Quốc Chung đang ôm 1.405 — hạn chế giao thêm. Ưu tiên phân cho Hà Văn Trung (322), Trần Thị Hoa (413) còn dư tải.</div></div>
+          <div class="step"><div class="step-n">3</div><div class="step-text"><strong>Đặt quy tắc cứng</strong>: kể từ hôm nay, mọi phiếu mới tạo phải có người TH trước khi lưu — yêu cầu bộ phận IT bổ sung validation bắt buộc.</div></div>
+        </div>
+        <div class="sol-kpi">
+          <div class="kpi-chip"><div class="kpi-label">Kết quả</div><div class="kpi-val">100% phiếu có người phụ trách</div></div>
+          <div class="kpi-chip"><div class="kpi-label">Thời hạn</div><div class="kpi-val">Cuối tuần này</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sol s3">
+      <div class="sol-stripe"></div>
+      <div class="sol-inner">
+        <div class="sol-head">
+          <div>
+            <div class="sol-num">GIẢI PHÁP 03 &nbsp;·&nbsp; TRONG TUẦN</div>
+            <div class="sol-title">Chiến dịch đóng BGSP — giao 3.235 GCN đã có trong tay</div>
+          </div>
+          <span class="sol-timing t-week">Trong tuần</span>
+        </div>
+        <div class="sol-problem">Giải quyết Nguyên nhân ② — GCN có rồi nhưng không ai giao</div>
+        <div class="sol-desc">3.235 phiếu có đủ điều kiện (PTĐ trả + BBĐL trả + có số GCN) — chỉ cần 1 bước hành động cuối là cập nhật BGSP trong hệ thống và giao tài liệu.</div>
+        <div class="sol-steps">
+          <div class="step"><div class="step-n">1</div><div class="step-text"><strong>Phân loại theo địa điểm</strong>: PTN ETV (giao trực tiếp tại phòng), Hiện trường (cần hẹn lịch ra ngoài), Cơ sở (giao qua bưu điện hoặc hẹn).</div></div>
+          <div class="step"><div class="step-n">2</div><div class="step-text"><strong>Nhóm PTN/Cơ sở</strong>: đặt lịch bàn giao 2 buổi/tuần, mỗi buổi xử lý batch 50–100 GCN, cập nhật hệ thống ngay trong buổi.</div></div>
+          <div class="step"><div class="step-n">3</div><div class="step-text"><strong>Nhóm Hiện trường</strong>: gộp các đơn vị cùng khu vực địa lý, bàn giao theo chuyến kết hợp với các nhiệm vụ hiện trường khác.</div></div>
+          <div class="step"><div class="step-n">4</div><div class="step-text"><strong>KPI hàng tuần</strong>: mỗi tuần đóng ít nhất 500 phiếu BGSP cho đến khi hết tồn đọng (khoảng 7 tuần).</div></div>
+        </div>
+        <div class="sol-kpi">
+          <div class="kpi-chip"><div class="kpi-label">Tiềm năng</div><div class="kpi-val">500+ phiếu/tuần có thể đóng</div></div>
+          <div class="kpi-chip"><div class="kpi-label">Hoàn thành tồn</div><div class="kpi-val">~7 tuần</div></div>
+          <div class="kpi-chip"><div class="kpi-label">Liên quan doanh thu</div><div class="kpi-val">GCN = điều kiện thu tiền dịch vụ</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sol s4">
+      <div class="sol-stripe"></div>
+      <div class="sol-inner">
+        <div class="sol-head">
+          <div>
+            <div class="sol-num">GIẢI PHÁP 04 &nbsp;·&nbsp; TRONG TUẦN</div>
+            <div class="sol-title">Đòi NTP — Yêu cầu đơn vị ngoài trả PTĐ và BBĐL tồn đọng</div>
+          </div>
+          <span class="sol-timing t-week">Trong tuần</span>
+        </div>
+        <div class="sol-problem">Giải quyết Nguyên nhân ③ — NTP không trả đúng hạn</div>
+        <div class="sol-desc">418 thiết bị và 874 biên bản đang nằm tại đơn vị NTP bên ngoài mà không có lịch hẹn trả rõ ràng.</div>
+        <div class="sol-steps">
+          <div class="step"><div class="step-n">1</div><div class="step-text"><strong>Gửi công văn/email chính thức</strong> đến từng đơn vị NTP (Navitek HCM, CLC HD, Vielab, HHCN) với danh sách cụ thể PTĐ và BBĐL cần thu hồi, kèm deadline.</div></div>
+          <div class="step"><div class="step-n">2</div><div class="step-text"><strong>Rà soát hợp đồng</strong>: có điều khoản thời hạn hoàn trả không? Nếu có → viện dẫn hợp đồng. Nếu không → bổ sung vào hợp đồng lần sau.</div></div>
+          <div class="step"><div class="step-n">3</div><div class="step-text"><strong>Đặt chế tài</strong>: phiếu NTP tồn quá 60 ngày → lãnh đạo phòng liên hệ trực tiếp cấp quản lý bên đơn vị NTP.</div></div>
+        </div>
+        <div class="sol-kpi">
+          <div class="kpi-chip"><div class="kpi-label">Đơn vị ưu tiên</div><div class="kpi-val">Navitek HCM, CLC HD, Vielab, HHCN</div></div>
+          <div class="kpi-chip"><div class="kpi-label">Mục tiêu</div><div class="kpi-val">Thu hồi 418 PTĐ + 874 BBĐL</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sol s5">
+      <div class="sol-stripe"></div>
+      <div class="sol-inner">
+        <div class="sol-head">
+          <div>
+            <div class="sol-num">GIẢI PHÁP 05 &nbsp;·&nbsp; TRONG THÁNG</div>
+            <div class="sol-title">Dọn phiếu "Không thực hiện" — Đóng 585 phiếu đang bị treo</div>
+          </div>
+          <span class="sol-timing t-month">Trong tháng</span>
+        </div>
+        <div class="sol-problem">Giải quyết Nguyên nhân ④ — Phiếu không thực hiện không được đóng</div>
+        <div class="sol-desc">585 phiếu "Không thực hiện" nhưng vẫn ở trạng thái "Chưa BGSP" đang làm phình số liệu tồn đọng. Cần quy trình đóng phiếu ngoại lệ.</div>
+        <div class="sol-steps">
+          <div class="step"><div class="step-n">1</div><div class="step-text">Xây dựng <strong>luồng "Đóng phiếu ngoại lệ"</strong> trong hệ thống: lý do không thực hiện (PTĐ hỏng / khách hủy / không đạt / chuyển đơn vị) + người duyệt đóng.</div></div>
+          <div class="step"><div class="step-n">2</div><div class="step-text">Lãnh đạo duyệt batch <strong>đóng 585 phiếu</strong> tồn đọng hiện tại, ghi rõ lý do từng nhóm.</div></div>
+          <div class="step"><div class="step-n">3</div><div class="step-text">Báo cáo và số liệu sau đó phải tách rõ: <strong>đang thực hiện / đã hoàn thành / đóng ngoại lệ</strong> — không gộp chung.</div></div>
+        </div>
+        <div class="sol-kpi">
+          <div class="kpi-chip"><div class="kpi-label">Số liệu BGSP thực</div><div class="kpi-val">Giảm tồn đọng "ảo" 585 phiếu</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sol s6">
+      <div class="sol-stripe"></div>
+      <div class="sol-inner">
+        <div class="sol-head">
+          <div>
+            <div class="sol-num">GIẢI PHÁP 06 &nbsp;·&nbsp; DÀI HẠN</div>
+            <div class="sol-title">Thiết lập hệ thống cảnh báo và KPI điều hành hàng ngày</div>
+          </div>
+          <span class="sol-timing t-long">Dài hạn</span>
+        </div>
+        <div class="sol-problem">Giải quyết Nguyên nhân ⑤ ⑥ — Không có cảnh báo, dữ liệu thiếu nhất quán</div>
+        <div class="sol-desc">Phòng tránh tái phát bằng cơ chế giám sát tự động. Chuyển từ "phát hiện vấn đề khi báo cáo" sang "cảnh báo ngay khi vấn đề phát sinh".</div>
+        <div class="sol-steps">
+          <div class="step"><div class="step-n">1</div><div class="step-text"><strong>5 ngưỡng cảnh báo tự động</strong>: PTĐ chưa trả > 7 ngày; BBĐL chưa về > 14 ngày; GCN chưa bàn giao > 30 ngày; Phiếu không có người TH > 1 ngày; NTP không trả > 45 ngày.</div></div>
+          <div class="step"><div class="step-n">2</div><div class="step-text"><strong>Báo cáo sáng hàng ngày</strong> qua Zalo/email: 5 số liệu cốt lõi (đã nêu ở trên) gửi đến lãnh đạo phòng trước 8h.</div></div>
+          <div class="step"><div class="step-n">3</div><div class="step-text"><strong>KPI cá nhân</strong>: % phiếu hoàn thành đúng hạn theo người TH — công khai hàng tuần để tạo áp lực tích cực.</div></div>
+          <div class="step"><div class="step-n">4</div><div class="step-text"><strong>Trường bắt buộc</strong> trong hệ thống: Người giao BGSP và Ngày giao phải được điền trước khi đóng phiếu.</div></div>
+        </div>
+        <div class="sol-kpi">
+          <div class="kpi-chip"><div class="kpi-label">Công cụ gợi ý</div><div class="kpi-val">Power BI / Google Looker Studio + Zalo OA</div></div>
+          <div class="kpi-chip"><div class="kpi-label">Lợi ích dài hạn</div><div class="kpi-val">Ngăn tồn đọng tái phát</div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════ TAB: PRIORITY ════ -->
+<div class="panel" id="panel-priority">
+
+  <div class="section-eyebrow">Ma trận ưu tiên tổng hợp</div>
+
+  <div class="card" style="margin-bottom:20px;">
+    <div class="card-b">
+      <div style="overflow-x:auto;">
+        <table class="matrix">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Hành động cụ thể</th>
+              <th>Nguyên nhân giải quyết</th>
+              <th>Số phiếu ảnh hưởng</th>
+              <th>Mức độ</th>
+              <th>Deadline</th>
+              <th>Người chịu trách nhiệm</th>
+              <th>Kết quả đo lường</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="num">1</td>
+              <td><strong>Chiến dịch quét tồn 392 phiếu chưa trả PTĐ</strong></td>
+              <td>Nguyên nhân ⑤</td>
+              <td class="num" style="color:var(--red)">392</td>
+              <td><span class="pill p-now">Khẩn cấp</span></td>
+              <td>5 ngày</td>
+              <td>Lãnh đạo phòng + cán bộ đơn vị</td>
+              <td>392 → 0</td>
+            </tr>
+            <tr>
+              <td class="num">2</td>
+              <td><strong>Phân công người TH cho 1.368 phiếu trống</strong></td>
+              <td>Nguyên nhân ①</td>
+              <td class="num" style="color:var(--red)">1.368</td>
+              <td><span class="pill p-now">Khẩn cấp</span></td>
+              <td>Cuối tuần</td>
+              <td>Trưởng phòng phân công</td>
+              <td>0 phiếu không có chủ</td>
+            </tr>
+            <tr>
+              <td class="num">3</td>
+              <td><strong>Giao 3.235 GCN đã có, đóng BGSP batch</strong></td>
+              <td>Nguyên nhân ②</td>
+              <td class="num" style="color:var(--amber)">3.235</td>
+              <td><span class="pill p-week">Ưu tiên cao</span></td>
+              <td>Bắt đầu tuần tới, 7 tuần</td>
+              <td>Cán bộ TH + bộ phận hành chính</td>
+              <td>500 phiếu/tuần</td>
+            </tr>
+            <tr>
+              <td class="num">4</td>
+              <td><strong>Công văn đòi PTĐ + BBĐL từ đơn vị NTP</strong></td>
+              <td>Nguyên nhân ③</td>
+              <td class="num" style="color:var(--amber)">418 + 874</td>
+              <td><span class="pill p-week">Ưu tiên cao</span></td>
+              <td>Trong tuần</td>
+              <td>Lãnh đạo phòng ký công văn</td>
+              <td>Thu hồi 100% trước 30 ngày</td>
+            </tr>
+            <tr>
+              <td class="num">5</td>
+              <td><strong>Dọn 585 phiếu "Không thực hiện" tồn đọng</strong></td>
+              <td>Nguyên nhân ④</td>
+              <td class="num">585</td>
+              <td><span class="pill p-month">Trung bình</span></td>
+              <td>Trong tháng</td>
+              <td>Lãnh đạo duyệt đóng phiếu</td>
+              <td>Tồn đọng "ảo" = 0</td>
+            </tr>
+            <tr>
+              <td class="num">6</td>
+              <td><strong>Bổ sung 517 phiếu sẵn sàng nhưng chưa có GCN</strong></td>
+              <td>Nguyên nhân ②⑥</td>
+              <td class="num">517</td>
+              <td><span class="pill p-month">Trung bình</span></td>
+              <td>Trong tháng</td>
+              <td>Người TH PTĐ đẩy ra GCN</td>
+              <td>517 GCN được phát hành</td>
+            </tr>
+            <tr>
+              <td class="num">7</td>
+              <td><strong>Thiết lập cảnh báo tự động + KPI hàng ngày</strong></td>
+              <td>Nguyên nhân ⑤⑥</td>
+              <td class="num">10.756</td>
+              <td><span class="pill p-long">Chiến lược</span></td>
+              <td>1–2 tháng</td>
+              <td>IT + Lãnh đạo phòng</td>
+              <td>0 phiếu tồn > 7 ngày không phát hiện</td>
+            </tr>
+            <tr>
+              <td class="num">8</td>
+              <td><strong>Validation bắt buộc người TH khi tạo phiếu mới</strong></td>
+              <td>Nguyên nhân ①</td>
+              <td class="num">Phòng tương lai</td>
+              <td><span class="pill p-long">Chiến lược</span></td>
+              <td>1 tháng</td>
+              <td>Bộ phận IT</td>
+              <td>100% phiếu mới có người TH ngay</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-eyebrow">Tác động kỳ vọng sau khi thực hiện</div>
+  <div class="g3">
+    <div class="card">
+      <div class="card-h"><h3>Trong 2 tuần</h3><span class="badge b-red">Khẩn cấp</span></div>
+      <div class="card-b" style="font-size:12px;color:var(--muted);line-height:1.8;">
+        ✓ 392 phiếu chưa trả → 0<br>
+        ✓ 1.368 phiếu không chủ → được phân công<br>
+        ✓ Công văn gửi đến tất cả đơn vị NTP<br>
+        ✓ Bắt đầu batch giao GCN hàng tuần
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-h"><h3>Trong 1–2 tháng</h3><span class="badge b-amber">Ưu tiên cao</span></div>
+      <div class="card-b" style="font-size:12px;color:var(--muted);line-height:1.8;">
+        ✓ 3.235 GCN tồn được bàn giao<br>
+        ✓ 585 phiếu "không TH" được đóng sạch<br>
+        ✓ 418 PTĐ + 874 BBĐL từ NTP thu hồi<br>
+        ✓ Tỉ lệ BGSP từ 42% → 70%+
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-h"><h3>Bền vững dài hạn</h3><span class="badge b-teal">Chiến lược</span></div>
+      <div class="card-b" style="font-size:12px;color:var(--muted);line-height:1.8;">
+        ✓ Cảnh báo tự động ngăn tồn đọng mới<br>
+        ✓ 100% phiếu mới có người TH<br>
+        ✓ KPI cá nhân tạo động lực<br>
+        ✓ Tỉ lệ BGSP mục tiêu → 95%+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</main>
+
+<script>
+  function switchTab(id) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    event.target.classList.add('active');
+    document.getElementById('panel-' + id).classList.add('active');
+  }
+  function toggleDiff(el) {
+    el.parentElement.classList.toggle('open');
+  }
+</script>

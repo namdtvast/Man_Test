@@ -1,0 +1,634 @@
+<title>Bảng Điều Hành – Phiếu Nhận Trả PTĐ</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy:    #1A3260;
+    --blue:    #2E6DA4;
+    --sky:     #4A90C4;
+    --amber:   #D97706;
+    --red:     #B91C1C;
+    --teal:    #1E7E6E;
+    --bg:      #EFF3F9;
+    --surface: #FFFFFF;
+    --border:  #D1DAE8;
+    --text:    #1A1F2E;
+    --muted:   #5A6478;
+    --light:   #8899B2;
+  }
+
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* ── Header ── */
+  header {
+    background: var(--navy);
+    color: #fff;
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 3px solid var(--amber);
+  }
+  .header-brand { display: flex; align-items: center; gap: 12px; }
+  .header-logo {
+    width: 32px; height: 32px;
+    background: var(--amber);
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 14px; color: var(--navy);
+    letter-spacing: -.5px;
+  }
+  .header-title { font-size: 13px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: #CBD5E8; }
+  .header-sub   { font-size: 11px; color: #7A92B8; letter-spacing: .06em; margin-top: 1px; }
+  .header-meta  { font-size: 12px; color: #7A92B8; font-variant-numeric: tabular-nums; }
+
+  /* ── Layout ── */
+  main { max-width: 1200px; margin: 0 auto; padding: 28px 24px 60px; }
+
+  .section-label {
+    font-size: 10px; font-weight: 700; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--light);
+    margin-bottom: 12px; margin-top: 32px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px;
+  }
+  .section-label:first-child { margin-top: 0; }
+
+  /* ── KPI Row ── */
+  .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+
+  .kpi {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 18px 20px 16px;
+    border-top: 3px solid transparent;
+    position: relative;
+  }
+  .kpi.ok     { border-top-color: var(--teal); }
+  .kpi.warn   { border-top-color: var(--amber); }
+  .kpi.crit   { border-top-color: var(--red); }
+  .kpi.info   { border-top-color: var(--blue); }
+
+  .kpi-label  { font-size: 11px; font-weight: 600; color: var(--muted); letter-spacing: .04em; text-transform: uppercase; margin-bottom: 8px; }
+  .kpi-value  { font-size: 32px; font-weight: 700; color: var(--text); line-height: 1; font-variant-numeric: tabular-nums; }
+  .kpi-sub    { font-size: 12px; color: var(--muted); margin-top: 6px; }
+  .kpi-badge  {
+    position: absolute; top: 16px; right: 16px;
+    font-size: 10px; font-weight: 700; letter-spacing: .06em;
+    padding: 3px 7px; border-radius: 3px;
+  }
+  .badge-ok   { background: #D1FAF2; color: var(--teal); }
+  .badge-warn { background: #FEF3C7; color: #92400E; }
+  .badge-crit { background: #FEE2E2; color: var(--red); }
+  .badge-info { background: #DBEAFE; color: #1E40AF; }
+
+  /* ── 3-col grid ── */
+  .grid-3 { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; align-items: start; }
+  .grid-equal { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+  /* ── Card ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .card-head {
+    padding: 14px 18px 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .card-head h3 { font-size: 13px; font-weight: 700; color: var(--text); }
+  .card-head span { font-size: 11px; color: var(--muted); }
+  .card-body { padding: 16px 18px; }
+
+  /* ── Horizontal bar chart ── */
+  .bar-list { display: flex; flex-direction: column; gap: 10px; }
+  .bar-item { }
+  .bar-meta { display: flex; justify-content: space-between; margin-bottom: 4px; }
+  .bar-name { font-size: 12px; color: var(--text); }
+  .bar-count { font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--muted); }
+  .bar-track { background: #EFF3F9; border-radius: 2px; height: 6px; overflow: hidden; }
+  .bar-fill  { height: 100%; border-radius: 2px; transition: width .4s ease; }
+  .fill-blue  { background: var(--blue); }
+  .fill-amber { background: var(--amber); }
+  .fill-red   { background: var(--red); }
+  .fill-teal  { background: var(--teal); }
+
+  /* ── Status table ── */
+  .status-table { width: 100%; border-collapse: collapse; }
+  .status-table th {
+    font-size: 10px; font-weight: 700; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--light);
+    text-align: left; padding: 0 12px 10px; border-bottom: 1px solid var(--border);
+  }
+  .status-table td {
+    padding: 10px 12px; border-bottom: 1px solid #F0F4F8;
+    font-size: 12px; font-variant-numeric: tabular-nums;
+  }
+  .status-table tr:last-child td { border-bottom: none; }
+  .status-table tr:hover td { background: #FAFBFD; }
+
+  /* ── Pill ── */
+  .pill {
+    display: inline-block; font-size: 10px; font-weight: 700;
+    letter-spacing: .04em; padding: 2px 8px; border-radius: 3px;
+  }
+  .pill-ok   { background: #D1FAF2; color: var(--teal); }
+  .pill-warn { background: #FEF3C7; color: #92400E; }
+  .pill-crit { background: #FEE2E2; color: var(--red); }
+  .pill-mute { background: #EFF3F9; color: var(--muted); }
+
+  /* ── Funnel ── */
+  .funnel { display: flex; flex-direction: column; gap: 3px; }
+  .funnel-step {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 14px; border-radius: 4px;
+  }
+  .funnel-step.done  { background: #F0FDF9; }
+  .funnel-step.pend  { background: #FFFBEB; }
+  .funnel-step.block { background: #FEF2F2; }
+  .funnel-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .dot-green  { background: var(--teal); }
+  .dot-amber  { background: var(--amber); }
+  .dot-red    { background: var(--red); }
+  .funnel-label { flex: 1; font-size: 12px; font-weight: 600; }
+  .funnel-count { font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .funnel-pct   { font-size: 11px; color: var(--muted); width: 42px; text-align: right; }
+  .funnel-arrow { color: var(--border); font-size: 18px; text-align: center; line-height: 1; }
+
+  /* ── Solutions ── */
+  .solutions { display: flex; flex-direction: column; gap: 14px; }
+  .sol {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 4px 1fr;
+  }
+  .sol-stripe { }
+  .sol-stripe.s1 { background: var(--blue); }
+  .sol-stripe.s2 { background: var(--amber); }
+  .sol-stripe.s3 { background: var(--teal); }
+  .sol-stripe.s4 { background: #7C3AED; }
+  .sol-stripe.s5 { background: var(--red); }
+  .sol-inner { padding: 16px 18px; background: var(--surface); }
+  .sol-head { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 6px; }
+  .sol-title { font-size: 13px; font-weight: 700; color: var(--text); }
+  .sol-tag {
+    font-size: 10px; font-weight: 700; letter-spacing: .06em;
+    padding: 2px 8px; border-radius: 3px; flex-shrink: 0; margin-left: 12px;
+    text-transform: uppercase;
+  }
+  .tag-now    { background: #FEE2E2; color: var(--red); }
+  .tag-week   { background: #FEF3C7; color: #92400E; }
+  .tag-month  { background: #DBEAFE; color: #1E40AF; }
+  .sol-body   { font-size: 12px; color: var(--muted); line-height: 1.7; }
+  .sol-impact { margin-top: 10px; display: flex; gap: 16px; flex-wrap: wrap; }
+  .impact-item { font-size: 11px; }
+  .impact-label { color: var(--light); text-transform: uppercase; letter-spacing: .06em; font-weight: 600; }
+  .impact-val   { color: var(--text); font-weight: 600; margin-left: 4px; }
+
+  /* ── People table ── */
+  .people-bar {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .people-track { flex: 1; background: #EFF3F9; border-radius: 2px; height: 5px; }
+  .people-fill  { height: 100%; border-radius: 2px; background: var(--blue); }
+  .people-num   { font-size: 11px; font-variant-numeric: tabular-nums; color: var(--muted); width: 30px; text-align: right; }
+
+  @media (max-width: 800px) {
+    .kpi-row { grid-template-columns: 1fr 1fr; }
+    .grid-3, .grid-equal { grid-template-columns: 1fr; }
+  }
+</style>
+
+<header>
+  <div class="header-brand">
+    <div class="header-logo">PTĐ</div>
+    <div>
+      <div class="header-title">Bảng Điều Hành — Phiếu Nhận Trả</div>
+      <div class="header-sub">Chi tiết tình trạng PTĐ / Mẫu &amp; Bàn giao sản phẩm</div>
+    </div>
+  </div>
+  <div class="header-meta">Dữ liệu: 30/06/2026 &nbsp;·&nbsp; Quý I–II/2026 &nbsp;·&nbsp; 10.756 dòng</div>
+</header>
+
+<main>
+
+  <!-- KPIs -->
+  <div class="section-label">Tổng quan</div>
+  <div class="kpi-row">
+    <div class="kpi info">
+      <div class="kpi-label">Tổng PTĐ / Mẫu</div>
+      <div class="kpi-value">10.756</div>
+      <div class="kpi-sub">Q1: 5.077 &nbsp;·&nbsp; Q2: 5.679</div>
+      <span class="kpi-badge badge-info">2026</span>
+    </div>
+    <div class="kpi crit">
+      <div class="kpi-label">Chưa trả PTĐ / Mẫu</div>
+      <div class="kpi-value">392</div>
+      <div class="kpi-sub">Tồn đọng cần xử lý ngay</div>
+      <span class="kpi-badge badge-crit">TỒN</span>
+    </div>
+    <div class="kpi warn">
+      <div class="kpi-label">Chưa BGSP (GCN)</div>
+      <div class="kpi-value">6.266</div>
+      <div class="kpi-sub">58,3% chưa hoàn tất bàn giao</div>
+      <span class="kpi-badge badge-warn">ĐANG CHỜ</span>
+    </div>
+    <div class="kpi warn">
+      <div class="kpi-label">Chưa trả BBĐL</div>
+      <div class="kpi-value">2.532</div>
+      <div class="kpi-sub">Biên bản đo lường còn tồn</div>
+      <span class="kpi-badge badge-warn">ĐANG CHỜ</span>
+    </div>
+  </div>
+
+  <!-- Funnel + Tồn theo đơn vị -->
+  <div class="section-label">Dòng chảy quy trình &amp; Điểm tắc nghẽn</div>
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-head">
+        <h3>Vòng đời Phiếu Nhận Trả — 4 trạng thái then chốt</h3>
+      </div>
+      <div class="card-body">
+        <div class="funnel">
+          <div class="funnel-step done">
+            <div class="funnel-dot dot-green"></div>
+            <div class="funnel-label">Đã nhận PTĐ / Mẫu (BT)</div>
+            <div class="funnel-count" style="color:var(--teal)">8.388</div>
+            <div class="funnel-pct" style="color:var(--teal)">78%</div>
+          </div>
+          <div class="funnel-arrow">↓</div>
+          <div class="funnel-step done">
+            <div class="funnel-dot dot-green"></div>
+            <div class="funnel-label">Đã trả PTĐ / Mẫu (BT)</div>
+            <div class="funnel-count" style="color:var(--teal)">8.887</div>
+            <div class="funnel-pct" style="color:var(--teal)">83%</div>
+          </div>
+          <div class="funnel-arrow">↓</div>
+          <div class="funnel-step pend">
+            <div class="funnel-dot dot-amber"></div>
+            <div class="funnel-label">Đã trả BBĐL</div>
+            <div class="funnel-count" style="color:var(--amber)">8.224</div>
+            <div class="funnel-pct" style="color:var(--amber)">76%</div>
+          </div>
+          <div class="funnel-arrow">↓</div>
+          <div class="funnel-step block">
+            <div class="funnel-dot dot-red"></div>
+            <div class="funnel-label">Đã BGSP / Có GCN — <strong>NÚT THẮT</strong></div>
+            <div class="funnel-count" style="color:var(--red)">4.490</div>
+            <div class="funnel-pct" style="color:var(--red)">42%</div>
+          </div>
+        </div>
+        <p style="font-size:11px;color:var(--muted);margin-top:14px;line-height:1.6;">
+          Bước cuối <strong>BGSP (GCN)</strong> là điểm tắc nghẽn lớn nhất: 6.266 phiếu chưa hoàn tất bàn giao sản phẩm — chiếm <strong>58%</strong> tổng số. Đây là nơi cần ưu tiên chỉ đạo.
+        </p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>Top đơn vị tồn đọng chưa trả PTĐ</h3>
+        <span>392 dòng</span>
+      </div>
+      <div class="card-body">
+        <div class="bar-list">
+          <div class="bar-item">
+            <div class="bar-meta"><span class="bar-name">CEM_NBinh</span><span class="bar-count">60</span></div>
+            <div class="bar-track"><div class="bar-fill fill-red" style="width:100%"></div></div>
+          </div>
+          <div class="bar-item">
+            <div class="bar-meta"><span class="bar-name">Vicem_Thanhthang</span><span class="bar-count">32</span></div>
+            <div class="bar-track"><div class="bar-fill fill-red" style="width:53%"></div></div>
+          </div>
+          <div class="bar-item">
+            <div class="bar-meta"><span class="bar-name">Vicem_HoangMai</span><span class="bar-count">30</span></div>
+            <div class="bar-track"><div class="bar-fill fill-red" style="width:50%"></div></div>
+          </div>
+          <div class="bar-item">
+            <div class="bar-meta"><span class="bar-name">Cty_DAP_HP</span><span class="bar-count">29</span></div>
+            <div class="bar-track"><div class="bar-fill fill-amber" style="width:48%"></div></div>
+          </div>
+          <div class="bar-item">
+            <div class="bar-meta"><span class="bar-name">Cty_Seraphin</span><span class="bar-count">28</span></div>
+            <div class="bar-track"><div class="bar-fill fill-amber" style="width:47%"></div></div>
+          </div>
+          <div class="bar-item">
+            <div class="bar-meta"><span class="bar-name">Vicem_VinhSon_HB</span><span class="bar-count">27</span></div>
+            <div class="bar-track"><div class="bar-fill fill-amber" style="width:45%"></div></div>
+          </div>
+          <div class="bar-item">
+            <div class="bar-meta"><span class="bar-name">CEM_HY</span><span class="bar-count">24</span></div>
+            <div class="bar-track"><div class="bar-fill fill-amber" style="width:40%"></div></div>
+          </div>
+          <div class="bar-item">
+            <div class="bar-meta"><span class="bar-name">Cty_GSOT</span><span class="bar-count">14</span></div>
+            <div class="bar-track"><div class="bar-fill fill-blue" style="width:23%"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Người thực hiện + Yêu cầu -->
+  <div class="section-label">Phân bổ khối lượng công việc</div>
+  <div class="grid-equal">
+    <div class="card">
+      <div class="card-head">
+        <h3>Người thực hiện PTĐ</h3>
+        <span>top 10</span>
+      </div>
+      <div class="card-body" style="padding-top:8px;">
+        <table class="status-table">
+          <thead>
+            <tr><th>Cán bộ</th><th style="text-align:right">Số lượng</th><th>Tỉ lệ</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Nguyễn Trần Quốc Chung</td>
+              <td style="text-align:right;font-weight:700">1.405</td>
+              <td><div class="people-bar"><div class="people-track"><div class="people-fill" style="width:100%"></div></div><span class="people-num">13%</span></div></td>
+            </tr>
+            <tr>
+              <td style="color:var(--red);font-weight:600">⚠ Chưa có người TH</td>
+              <td style="text-align:right;font-weight:700;color:var(--red)">1.368</td>
+              <td><div class="people-bar"><div class="people-track"><div class="people-fill" style="width:97%;background:var(--red)"></div></div><span class="people-num">13%</span></div></td>
+            </tr>
+            <tr>
+              <td>Nguyễn Văn Huy</td>
+              <td style="text-align:right;font-weight:700">1.038</td>
+              <td><div class="people-bar"><div class="people-track"><div class="people-fill" style="width:74%"></div></div><span class="people-num">10%</span></div></td>
+            </tr>
+            <tr>
+              <td>Nguyễn Văn Đồng</td>
+              <td style="text-align:right;font-weight:700">882</td>
+              <td><div class="people-bar"><div class="people-track"><div class="people-fill" style="width:63%"></div></div><span class="people-num">8%</span></div></td>
+            </tr>
+            <tr>
+              <td>Trần Trung Hưng</td>
+              <td style="text-align:right;font-weight:700">824</td>
+              <td><div class="people-bar"><div class="people-track"><div class="people-fill" style="width:59%"></div></div><span class="people-num">8%</span></div></td>
+            </tr>
+            <tr>
+              <td>Vũ Mạnh Đức</td>
+              <td style="text-align:right;font-weight:700">633</td>
+              <td><div class="people-bar"><div class="people-track"><div class="people-fill" style="width:45%"></div></div><span class="people-num">6%</span></div></td>
+            </tr>
+            <tr>
+              <td>Trần Đức Lợi</td>
+              <td style="text-align:right;font-weight:700">624</td>
+              <td><div class="people-bar"><div class="people-track"><div class="people-fill" style="width:44%"></div></div><span class="people-num">6%</span></div></td>
+            </tr>
+            <tr>
+              <td>Đỗ Hoàng Dương</td>
+              <td style="text-align:right;font-weight:700">589</td>
+              <td><div class="people-bar"><div class="people-track"><div class="people-fill" style="width:42%"></div></div><span class="people-num">5%</span></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>Loại yêu cầu thực hiện</h3>
+        <span>10.756 dòng</span>
+      </div>
+      <div class="card-body">
+        <div class="bar-list">
+          <div class="bar-item">
+            <div class="bar-meta"><span class="bar-name">HC – Hiệu chuẩn</span><span class="bar-count">5.168</span></div>
+            <div class="bar-track"><div class="bar-fill fill-blue" style="width:100%"></div></div>
+          </div>
+          <div class="bar-item">
+            <div class="bar-meta"><span class="bar-name">KĐ – Kiểm định</span><span class="bar-count">2.166</span></div>
+            <div class="bar-track"><div class="bar-fill fill-blue" style="width:42%"></div></div>
+          </div>
+          <div class="bar-item">
+            <div class="bar-meta"><span class="bar-name">NTP (RA)</span><span class="bar-count">1.533</span></div>
+            <div class="bar-track"><div class="bar-fill fill-teal" style="width:30%"></div></div>
+          </div>
+          <div class="bar-item">
+            <div class="bar-meta"><span class="bar-name">KĐTN</span><span class="bar-count">685</span></div>
+            <div class="bar-track"><div class="bar-fill fill-teal" style="width:13%"></div></div>
+          </div>
+          <div class="bar-item">
+            <div class="bar-meta"><span class="bar-name">NTP (HC)</span><span class="bar-count">293</span></div>
+            <div class="bar-track"><div class="bar-fill fill-amber" style="width:6%"></div></div>
+          </div>
+          <div class="bar-item">
+            <div class="bar-meta"><span class="bar-name">ĐGHT</span><span class="bar-count">273</span></div>
+            <div class="bar-track"><div class="bar-fill fill-amber" style="width:5%"></div></div>
+          </div>
+          <div class="bar-item">
+            <div class="bar-meta"><span class="bar-name">NTP (KĐ) / TN / Khác</span><span class="bar-count">178</span></div>
+            <div class="bar-track"><div class="bar-fill fill-red" style="width:4%"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>Địa điểm thực hiện</h3>
+      </div>
+      <div class="card-body">
+        <div class="bar-list">
+          <div class="bar-item">
+            <div class="bar-meta"><span class="bar-name">PTN (ETV) – Phòng thí nghiệm</span><span class="bar-count">4.642</span></div>
+            <div class="bar-track"><div class="bar-fill fill-blue" style="width:100%"></div></div>
+          </div>
+          <div class="bar-item">
+            <div class="bar-meta"><span class="bar-name">Hiện trường</span><span class="bar-count">3.503</span></div>
+            <div class="bar-track"><div class="bar-fill fill-blue" style="width:75%"></div></div>
+          </div>
+          <div class="bar-item">
+            <div class="bar-meta"><span class="bar-name">NTP – Nhà thứ phương</span><span class="bar-count">1.993</span></div>
+            <div class="bar-track"><div class="bar-fill fill-teal" style="width:43%"></div></div>
+          </div>
+          <div class="bar-item">
+            <div class="bar-meta"><span class="bar-name">Cơ sở (tại khách hàng)</span><span class="bar-count">414</span></div>
+            <div class="bar-track"><div class="bar-fill fill-amber" style="width:9%"></div></div>
+          </div>
+        </div>
+        <p style="font-size:11px;color:var(--muted);margin-top:14px;line-height:1.6;">
+          43% khối lượng thực hiện ngoài phòng thí nghiệm (hiện trường + NTP + cơ sở), đòi hỏi phối hợp logistic chặt chẽ để theo dõi trả hàng.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Giải pháp -->
+  <div class="section-label">Đề xuất giải pháp chỉ đạo &amp; điều hành</div>
+  <div class="solutions">
+
+    <div class="sol">
+      <div class="sol-stripe s1"></div>
+      <div class="sol-inner">
+        <div class="sol-head">
+          <div class="sol-title">① Lập danh sách đỏ — Xử lý ngay 392 PTĐ chưa được trả</div>
+          <span class="sol-tag tag-now">Ngay hôm nay</span>
+        </div>
+        <div class="sol-body">
+          Trích xuất riêng 392 dòng có trạng thái <em>"Chưa trả (PTĐ/Mẫu)"</em>. Phân nhóm theo đơn vị gửi (ưu tiên CEM_NBinh 60 thiết bị, Vicem_Thanhthang 32, Vicem_HoangMai 30). Giao trực tiếp cho trưởng phòng / cán bộ phụ trách từng đơn vị, đặt deadline cụ thể (ngày/giờ) và cơ chế báo cáo nhanh (sáng – chiều). Không để tồn qua tuần.
+        </div>
+        <div class="sol-impact">
+          <div class="impact-item"><span class="impact-label">Mục tiêu</span><span class="impact-val">Giảm 392 → 0 trong 3–5 ngày</span></div>
+          <div class="impact-item"><span class="impact-label">Người chỉ đạo</span><span class="impact-val">Lãnh đạo phòng trực tiếp giao việc</span></div>
+          <div class="impact-item"><span class="impact-label">Công cụ</span><span class="impact-val">Excel filter + nhóm chat đơn vị</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sol">
+      <div class="sol-stripe s2"></div>
+      <div class="sol-inner">
+        <div class="sol-head">
+          <div class="sol-title">② Phân công người thực hiện cho 1.368 phiếu "Chưa có người TH PTĐ"</div>
+          <span class="sol-tag tag-now">Trong tuần</span>
+        </div>
+        <div class="sol-body">
+          1.368 dòng không có ai phụ trách là rủi ro lớn nhất — không ai chịu trách nhiệm thì không ai hành động. Rà soát từng dòng, gán người thực hiện cụ thể dựa trên loại yêu cầu (HC/KĐ) và địa điểm. Cân đối tải: Nguyễn Trần Quốc Chung đang ôm 1.405 (cao nhất), xem xét phân phối bớt cho nhân sự còn dư dung lượng.
+        </div>
+        <div class="sol-impact">
+          <div class="impact-item"><span class="impact-label">Rủi ro nếu không làm</span><span class="impact-val">Phiếu trôi nổi, không có người theo dõi</span></div>
+          <div class="impact-item"><span class="impact-label">Kết quả kỳ vọng</span><span class="impact-val">100% phiếu có người phụ trách</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sol">
+      <div class="sol-stripe s3"></div>
+      <div class="sol-inner">
+        <div class="sol-head">
+          <div class="sol-title">③ Thiết lập quy trình đóng BGSP — phá nút thắt 6.266 phiếu tồn</div>
+          <span class="sol-tag tag-week">Trong tuần</span>
+        </div>
+        <div class="sol-body">
+          BGSP (GCN) đang là bước cuối bị ứ lại lớn nhất (58% chưa hoàn tất). Cần làm rõ: <br>
+          <strong>(a)</strong> Ai có quyền phê duyệt GCN? &nbsp;<strong>(b)</strong> Điều kiện cần đủ để đóng BGSP là gì? &nbsp;<strong>(c)</strong> Hiện tại bước trả PTĐ và trả BBĐL đã hoàn thành ở nhiều phiếu — đó là tín hiệu sẵn sàng để đóng BGSP. <br>
+          Lập bảng theo dõi riêng: PTĐ đã trả + BBĐL đã trả → xếp vào hàng đợi BGSP ưu tiên. Chạy chiến dịch đóng BGSP theo tuần với KPI cụ thể.
+        </div>
+        <div class="sol-impact">
+          <div class="impact-item"><span class="impact-label">Tiềm năng</span><span class="impact-val">Đóng 2.000–3.000 phiếu/tuần nếu có quy trình rõ</span></div>
+          <div class="impact-item"><span class="impact-label">Doanh thu ảnh hưởng</span><span class="impact-val">GCN gắn với thu tiền dịch vụ</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sol">
+      <div class="sol-stripe s4"></div>
+      <div class="sol-inner">
+        <div class="sol-head">
+          <div class="sol-title">④ Theo dõi BBĐL — Thu hồi 2.532 biên bản còn tồn đọng</div>
+          <span class="sol-tag tag-week">Trong tuần</span>
+        </div>
+        <div class="sol-body">
+          2.532 BBĐL chưa trả cần được phân nhóm theo: (a) đã trả PTĐ rồi nhưng BBĐL chưa trả — ưu tiên xử lý; (b) PTĐ vẫn đang thực hiện — chấp nhận chờ. Với nhóm (a), giao cán bộ phụ trách thu hồi có lịch cụ thể. Với nhóm hiện trường/NTP, phối hợp với đơn vị thực hiện bên ngoài để đảm bảo biên bản được chuyển đúng hạn.
+        </div>
+        <div class="sol-impact">
+          <div class="impact-item"><span class="impact-label">Phân loại</span><span class="impact-val">Ưu tiên nhóm PTĐ đã trả nhưng BBĐL chưa về</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sol">
+      <div class="sol-stripe s5"></div>
+      <div class="sol-inner">
+        <div class="sol-head">
+          <div class="sol-title">⑤ Báo cáo điều hành hàng ngày — Bộ chỉ số 5 con số cần theo dõi</div>
+          <span class="sol-tag tag-month">Dài hạn</span>
+        </div>
+        <div class="sol-body">
+          Thiết lập báo cáo sáng hàng ngày (hoặc mỗi ca) với 5 chỉ số: <br>
+          <strong>(1)</strong> Số PTĐ chưa trả &nbsp;
+          <strong>(2)</strong> Số BGSP chưa đóng &nbsp;
+          <strong>(3)</strong> Số phiếu chưa có người TH &nbsp;
+          <strong>(4)</strong> BBĐL chưa thu &nbsp;
+          <strong>(5)</strong> Khối lượng đóng mới trong ngày. <br>
+          Cân nhắc tích hợp cảnh báo tự động qua email/Zalo khi phiếu vượt quá ngưỡng thời gian (vd: 7 ngày chưa trả PTĐ, 30 ngày chưa BGSP). Mọi quyết định chỉ đạo nên dựa trên bộ số này.
+        </div>
+        <div class="sol-impact">
+          <div class="impact-item"><span class="impact-label">Lợi ích</span><span class="impact-val">Phát hiện tồn đọng ngay ngày đầu thay vì cuối tuần</span></div>
+          <div class="impact-item"><span class="impact-label">Công cụ gợi ý</span><span class="impact-val">Power BI / Google Sheets tự động refresh</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Ma trận ưu tiên -->
+  <div class="section-label">Ma trận ưu tiên hành động</div>
+  <div class="card">
+    <div class="card-body">
+      <table class="status-table" style="min-width:600px;">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Hành động</th>
+            <th>Số lượng ảnh hưởng</th>
+            <th>Mức độ ưu tiên</th>
+            <th>Thời hạn đề xuất</th>
+            <th>Người chịu trách nhiệm</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="font-weight:700">1</td>
+            <td>Thu hồi PTĐ chưa được trả</td>
+            <td style="font-variant-numeric:tabular-nums;font-weight:700;color:var(--red)">392 phiếu</td>
+            <td><span class="pill pill-crit">Khẩn cấp</span></td>
+            <td>3–5 ngày</td>
+            <td>Cán bộ phụ trách đơn vị</td>
+          </tr>
+          <tr>
+            <td style="font-weight:700">2</td>
+            <td>Gán người TH cho phiếu chưa phân công</td>
+            <td style="font-variant-numeric:tabular-nums;font-weight:700;color:var(--red)">1.368 phiếu</td>
+            <td><span class="pill pill-crit">Khẩn cấp</span></td>
+            <td>Trong tuần</td>
+            <td>Trưởng phòng phân công</td>
+          </tr>
+          <tr>
+            <td style="font-weight:700">3</td>
+            <td>Thu hồi BBĐL nhóm PTĐ đã trả xong</td>
+            <td style="font-variant-numeric:tabular-nums;font-weight:700;color:var(--amber)">~1.000+ phiếu</td>
+            <td><span class="pill pill-warn">Cao</span></td>
+            <td>Tuần này</td>
+            <td>Người trả PTĐ phụ trách</td>
+          </tr>
+          <tr>
+            <td style="font-weight:700">4</td>
+            <td>Mở chiến dịch đóng BGSP tuần</td>
+            <td style="font-variant-numeric:tabular-nums;font-weight:700;color:var(--amber)">6.266 phiếu</td>
+            <td><span class="pill pill-warn">Cao</span></td>
+            <td>Bắt đầu tuần tới</td>
+            <td>Lãnh đạo phòng + cán bộ TH</td>
+          </tr>
+          <tr>
+            <td style="font-weight:700">5</td>
+            <td>Thiết lập dashboard báo cáo hàng ngày</td>
+            <td style="font-variant-numeric:tabular-nums;font-weight:700;color:var(--blue)">Toàn bộ 10.756</td>
+            <td><span class="pill pill-mute">Trung bình</span></td>
+            <td>Trong tháng</td>
+            <td>IT / Phòng kế hoạch</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
